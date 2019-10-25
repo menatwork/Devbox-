@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
-import sys
 import os
 import shlex
+import subprocess
+import sys
 
 
 class Command(object):
@@ -11,11 +12,11 @@ class Command(object):
 
 
 def print_info(message):
-    print("\033[96mdevbox:", message, end="\033[0m\n")
+    print("\033[96mdevbox ::", message, end="\033[0m\n")
 
 
 def print_error(message):
-    print("\033[91mdevbox:", message, end="\033[0m\n")
+    print("\033[91mdevbox ::", message, end="\033[0m\n")
 
 
 def vagrant_shim(vagrant_command=None, *extra_args):
@@ -34,10 +35,13 @@ def vagrant_shim(vagrant_command=None, *extra_args):
         if len(extra_args) > 0:
             command.extend(extra_args)
 
-        print_info("Running " + shlex.quote(" ".join(command)))
+        print_info("running " + shlex.quote(" ".join(command)))
 
-        os.chdir(os.environ["DEVBOX_VAGRANT_DIR"])
-        os.execvp("vagrant", command)
+        p = subprocess.run(command, cwd=os.environ["DEVBOX_VAGRANT_DIR"])
+
+        if p.returncode != 0:
+            print_error("command exited with {}".format(p.returncode))
+            sys.exit(p.returncode)
 
     return f
 
@@ -63,20 +67,26 @@ COMMANDS = {
 }
 
 
+def print_usage():
+    print("\033[96m", end="") # light-cyan text
+
+    print("Usage: devbox COMMAND ARGS")
+
+    longest_name_len = max([len(name) for name in COMMANDS.keys()])
+    row_format = "    {:<" + str(longest_name_len + 4) + "}{}"
+
+    for command_name, command in COMMANDS.items():
+        print(row_format.format(command_name, command.short_help))
+
+    print("\033[0m") # reset text color
+
+
 def main():
     args = sys.argv[1:]
 
     if len(args) == 0:
         print_error("missing command")
-
-        print("Usage: devbox COMMAND ARGS")
-
-        longest_name_len = max([len(name) for name in COMMANDS.keys()])
-        row_format = "    {:<" + str(longest_name_len + 4) + "}{}"
-
-        for command_name, command in COMMANDS.items():
-            print(row_format.format(command_name, command.short_help))
-
+        print_usage()
         sys.exit(1)
 
     command = args[0]
@@ -93,6 +103,7 @@ def main():
         COMMANDS[command].function(command_args)
     except KeyError:
         print_error("unknown command: " + command)
+        print_usage()
         sys.exit(1)
 
 

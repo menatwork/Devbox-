@@ -39,4 +39,7 @@ cp tmux.conf /etc/tmux.conf
 rm -rf /home/vagrant/.cache
 ln -s /devbox/home-vagrant-cache /home/vagrant/.cache
 
+printf "\n\n# Added by devbox provisioning script\ncd /devbox/web\n" \
+       >> /home/vagrant/.bashrc
+
 echo "devbox: provisioning complete\n"

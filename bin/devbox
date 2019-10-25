@@ -46,6 +46,11 @@ def vagrant_shim(vagrant_command=None, *extra_args):
     return f
 
 
+def devbox_reset(args):
+    vagrant_shim("destroy", "-f")([])
+    vagrant_shim("up")([])
+
+
 def devbox_version(args):
     print('devbox 0.1')
 
@@ -59,6 +64,8 @@ COMMANDS = {
     "vagrant": COMMAND_VAGRANT,
     "vg": COMMAND_VAGRANT,
     "v": COMMAND_VAGRANT,
+
+    "reset": Command(devbox_reset, "destroy and rebuild devbox VM"),
 
     "tmux": COMMAND_TMUX,
     "st": COMMAND_TMUX,

@@ -1,0 +1,38 @@
+# coding: utf-8
+require_relative "devbox"
+
+Vagrant.configure("2") do |config|
+  dc = DEVBOX_CONFIG
+
+  config.vm.box = "generic/ubuntu1804"
+  config.vm.hostname = "devbox"
+
+  config.vm.network "private_network", ip: "192.168.137.2"
+
+  devbox_synced_folder config, ".", "/devbox/vagrant"
+
+  devbox_synced_folder config, :host_webroot_dir, "/devbox/web"
+  devbox_synced_folder config, :host_cache_dir, "/devbox/home-vagrant-cache"
+
+  devbox_synced_folder config,
+                       devbox_join_state_dir("apache2-sites"),
+                       "/devbox/apache2-sites"
+
+  config.vm.provider "virtualbox" do |virtualbox|
+    virtualbox.cpus = dc[:cores]
+    virtualbox.memory = dc[:memory]
+    virtualbox.default_nic_type = "virtio" if linux?
+  end
+
+  if linux?
+    config.vm.provider "libvirt" do |libvirt|
+      libvirt.cpus = dc[:cores]
+      libvirt.memory = dc[:memory]
+      libvirt.disk_bus = "virtio"
+    end
+  end
+
+  config.vm.provision "shell", path: "provision"
+
+  config.ssh.extra_args = ["-A"]
+end

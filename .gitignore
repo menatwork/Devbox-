@@ -1,0 +1,5 @@
+# Ubuntu boxes create log files next to their Vagrantfile
+/vagrant/*.log
+
+# Local Vagrant state directory
+/vagrant/.vagrant/

@@ -1,0 +1,40 @@
+#!/bin/sh
+set -eu
+cd /devbox/vagrant/files
+
+# This also does an apt-get update automatically.
+apt-add-repository --yes ppa:ondrej/php
+
+apt-get install -y \
+        php7.3-fpm php7.3-xml php7.3-curl php7.3-intl php7.3-gd \
+        php7.3-mbstring php7.3-zip php7.3-mysql php7.3-soap apache2 composer \
+	default-mysql-client pv tree
+
+# Apache setup
+cp apache2-devbox.conf       /etc/apache2/conf-available/devbox.conf
+cp apache2-devbox-vhost.conf /etc/apache2/sites-available/devbox.conf
+
+a2enmod   --quiet proxy_fcgi setenvif rewrite
+a2enconf  --quiet php7.3-fpm devbox
+a2dissite --quiet 000-default
+a2ensite  --quiet devbox
+
+systemctl reload apache2
+
+# php-fpm setup
+(
+  pool_d=/etc/php/7.3/fpm/pool.d
+  if [ -f "$pool_d"/www.conf ]; then
+      mv "$pool_d"/www.conf "$pool_d"/www.conf.disabled
+  fi
+  cp php-fpm.conf "$pool_d"/
+)
+
+systemctl restart php7.3-fpm
+
+# Config for system utils
+
+cp tmux.conf /etc/tmux.conf
+ln -s /devbox/home-vagrant-cache /home/vagrant/.cache
+
+echo "🌙 devbox: provisioning complete\n"

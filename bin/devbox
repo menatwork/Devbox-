@@ -1,0 +1,99 @@
+#!/usr/bin/env python3
+import sys
+import os
+import shlex
+
+
+class Command(object):
+    def __init__(self, function, short_help):
+        self.function = function
+        self.short_help = short_help
+
+
+def print_info(message):
+    print("\033[32mdevbox:", message, end="\033[0m\n")
+
+
+def print_error(message):
+    print("\033[91mdevbox:", message, end="\033[0m\n")
+
+
+def vagrant_shim(vagrant_command=None, *extra_args):
+    def f(args):
+        nonlocal vagrant_command
+        command = ["vagrant"]
+
+        if vagrant_command:
+            command.append(vagrant_command)
+        elif len(args) > 0:
+            command.append(args[0])
+
+        if len(args) > 1:
+            command.extend(args[1:])
+
+        if len(extra_args) > 0:
+            command.extend(extra_args)
+
+        print_info("Running " + shlex.quote(" ".join(command)))
+
+        os.chdir(os.environ["DEVBOX_VAGRANT_DIR"])
+        os.execvp("vagrant", command)
+
+    return f
+
+
+def devbox_version(args):
+    print('devbox 0.1')
+
+
+COMMAND_VAGRANT = Command(vagrant_shim(), "vagrant commands")
+
+COMMAND_TMUX = Command(vagrant_shim("ssh", "--", "-t", "tmux", "new", "-As0"),
+                       "`vagrant ssh tmux new -As0`")
+
+COMMANDS = {
+    "vagrant": COMMAND_VAGRANT,
+    "vg": COMMAND_VAGRANT,
+    "v": COMMAND_VAGRANT,
+
+    "tmux": COMMAND_TMUX,
+    "st": COMMAND_TMUX,
+
+    "version": Command(devbox_version, "display tool version")
+}
+
+
+def main():
+    args = sys.argv[1:]
+
+    if len(args) == 0:
+        print_error("missing command")
+
+        print("Usage: devbox COMMAND ARGS")
+
+        longest_name_len = max([len(name) for name in COMMANDS.keys()])
+        row_format = "    {:<" + str(longest_name_len + 4) + "}{}"
+
+        for command_name, command in COMMANDS.items():
+            print(row_format.format(command_name, command.short_help))
+
+        sys.exit(1)
+
+    command = args[0]
+    command_args = args[1:]
+
+    devbox_bin_path = os.path.abspath(sys.argv[0])
+    devbox_dir = os.path.dirname(os.path.dirname(devbox_bin_path))
+    devbox_vagrant_dir = os.path.join(devbox_dir, "vagrant")
+
+    os.environ["DEVBOX_DIR"] = devbox_dir
+    os.environ["DEVBOX_VAGRANT_DIR"] = devbox_vagrant_dir
+  
+    try:
+        COMMANDS[command].function(command_args)
+    except KeyError:
+        print_error("unknown command: " + command)
+        sys.exit(1)
+
+
+main()

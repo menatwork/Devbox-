@@ -11,7 +11,7 @@ class Command(object):
 
 
 def print_info(message):
-    print("\033[32mdevbox:", message, end="\033[0m\n")
+    print("\033[96mdevbox:", message, end="\033[0m\n")
 
 
 def print_error(message):

@@ -56,6 +56,25 @@ def devbox_reset(args):
     vagrant_shim("up")([])
 
 
+def abbrevuser(path):
+    return path.replace(os.path.expanduser("~"), "~", 1)
+
+
+def devbox_edit(args):
+    if len(args) != 1:
+        print_error("invalid arguments")
+        print_usage("edit", "<vhost name>")
+        sys.exit(1)
+
+    sites_dir   = os.path.expanduser("~/.local/share/devbox/apache2-sites")
+    target_file = os.path.join(sites_dir, "{}.conf".format(args[0]))
+
+    print_info("editing {}".format(abbrevuser(target_file)))
+    subprocess.run(["vim", target_file])
+
+    vagrant_shim("ssh", "--", "sudo", "systemctl", "reload", "apache2")([])
+
+
 def devbox_version(args):
     print('devbox 0.1')
 
@@ -64,6 +83,8 @@ COMMAND_VAGRANT = Command(vagrant_shim(), "vagrant commands")
 
 COMMAND_TMUX = Command(vagrant_shim("ssh", "--", "-t", "tmux", "new", "-As0"),
                        "create or attach to tmux session 0 in the VM")
+
+COMMAND_EDIT = Command(devbox_edit, "edit a vhost config")
 
 COMMANDS = {
     "vagrant": COMMAND_VAGRANT,
@@ -75,22 +96,25 @@ COMMANDS = {
     "tmux": COMMAND_TMUX,
     "st": Alias(COMMAND_TMUX, "tmux"),
 
+    "edit": COMMAND_EDIT,
+    "e": Alias(COMMAND_EDIT, "e"),
+
     "version": Command(devbox_version, "display tool version")
 }
 
 
-def print_usage():
-    print("\033[96m", end="") # light-cyan text
-
-    print("Usage: devbox COMMAND ARGS")
+def print_usage_full():
+    print_usage()
 
     longest_name_len = max([len(name) for name in COMMANDS.keys()])
     row_format = "    {:<" + str(longest_name_len + 4) + "}{}"
 
     for command_name, command in COMMANDS.items():
-        print(row_format.format(command_name, command.short_help))
+        print(row_format.format(command_name, command.short_help), file=sys.stderr)
 
-    print("\033[0m") # reset text color
+
+def print_usage(command="<command>", args="[<arg>...]"):
+    print("Usage: devbox", command, args, file=sys.stderr)
 
 
 def main():
@@ -98,7 +122,7 @@ def main():
 
     if len(args) == 0:
         print_error("missing command")
-        print_usage()
+        print_usage_full()
         sys.exit(1)
 
     command = args[0]

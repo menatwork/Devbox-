@@ -11,12 +11,17 @@ class Command(object):
         self.short_help = short_help
 
 
+class Alias(Command):
+    def __init__(self, command, name):
+        super().__init__(command.function, "alias of '{}'".format(name))
+
+
 def print_info(message):
-    print("\033[96mdevbox ::", message, end="\033[0m\n")
+    print("\033[96mdevbox \033[1m▷\033[0m", message)
 
 
 def print_error(message):
-    print("\033[91mdevbox ::", message, end="\033[0m\n")
+    print("\033[91mdevbox \033[1m▷\033[0m", message, file=sys.stderr)
 
 
 def vagrant_shim(vagrant_command=None, *extra_args):
@@ -58,17 +63,17 @@ def devbox_version(args):
 COMMAND_VAGRANT = Command(vagrant_shim(), "vagrant commands")
 
 COMMAND_TMUX = Command(vagrant_shim("ssh", "--", "-t", "tmux", "new", "-As0"),
-                       "`vagrant ssh tmux new -As0`")
+                       "create or attach to tmux session 0 in the VM")
 
 COMMANDS = {
     "vagrant": COMMAND_VAGRANT,
-    "vg": COMMAND_VAGRANT,
-    "v": COMMAND_VAGRANT,
+    "vg": Alias(COMMAND_VAGRANT, "vagrant"),
+    "v": Alias(COMMAND_VAGRANT, "vagrant"),
 
-    "reset": Command(devbox_reset, "destroy and rebuild devbox VM"),
+    "reset": Command(devbox_reset, "destroy and rebuild the VM"),
 
     "tmux": COMMAND_TMUX,
-    "st": COMMAND_TMUX,
+    "st": Alias(COMMAND_TMUX, "tmux"),
 
     "version": Command(devbox_version, "display tool version")
 }

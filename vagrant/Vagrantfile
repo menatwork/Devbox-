@@ -19,6 +19,7 @@ Vagrant.configure("2") do |config|
                        "/devbox/apache2-sites"
 
   config.vm.provider "virtualbox" do |virtualbox|
+    virtualbox.name = "devbox"
     virtualbox.cpus = dc[:cores]
     virtualbox.memory = dc[:memory]
     virtualbox.default_nic_type = "virtio" if linux?
@@ -26,6 +27,7 @@ Vagrant.configure("2") do |config|
 
   if linux?
     config.vm.provider "libvirt" do |libvirt|
+      libvirt.default_prefix = "devbox"
       libvirt.cpus = dc[:cores]
       libvirt.memory = dc[:memory]
       libvirt.disk_bus = "virtio"

@@ -70,7 +70,7 @@ def devbox_edit(args):
     target_file = os.path.join(sites_dir, "{}.conf".format(args[0]))
 
     print_info("editing {}".format(abbrevuser(target_file)))
-    subprocess.run(["vim", target_file])
+    subprocess.run(["vim", target_file], cwd=sites_dir)
 
     vagrant_shim("ssh", "--", "sudo", "systemctl", "reload", "apache2")([])
 

@@ -11,7 +11,7 @@ Vagrant.configure("2") do |config|
 
   devbox_synced_folder config, ".", "/devbox/vagrant"
 
-  devbox_synced_folder config, :host_webroot_dir, "/devbox/web"
+  devbox_synced_folder config, :host_webroot_dir, "/projects"
   devbox_synced_folder config, :host_cache_dir, "/devbox/home-vagrant-cache"
 
   devbox_synced_folder config,

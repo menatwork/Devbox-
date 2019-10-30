@@ -10,7 +10,7 @@ def devbox_sync_options
   if linux?
     {
       type: "nfs",
-      mount_options: ["rw", "tcp", "fsc"],
+      mount_options: ["rw", "tcp"],
       linux__nfs_options: ["rw", "async"] 
     }
   else

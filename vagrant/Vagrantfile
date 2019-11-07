@@ -37,4 +37,9 @@ Vagrant.configure("2") do |config|
   config.vm.provision "shell", path: "provision"
 
   config.ssh.extra_args = ["-A"]
+
+  config.trigger.after :up do |trigger|
+    trigger.name = "Restart Apache after NFS mounts"
+    trigger.run_remote = {inline: "systemctl restart apache2"}
+  end
 end

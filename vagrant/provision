@@ -27,7 +27,7 @@ apt-get install --yes --no-install-recommends \
 cp apache2-devbox.conf       /etc/apache2/conf-available/devbox.conf
 cp apache2-devbox-vhost.conf /etc/apache2/sites-available/devbox.conf
 
-a2enmod   --quiet proxy_fcgi setenvif rewrite
+a2enmod   --quiet proxy_fcgi setenvif rewrite headers
 a2enconf  --quiet php7.3-fpm devbox
 a2dissite --quiet 000-default
 a2ensite  --quiet devbox

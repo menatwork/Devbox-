@@ -1,13 +1,24 @@
-#!/bin/sh
+#!/bin/bash
 set -eu
 cd /devbox/vagrant/files
 
 # This also does an apt-get update automatically.
 apt-add-repository --yes ppa:ondrej/php
 
-apt-get install -y \
-        php7.3-fpm php7.3-xml php7.3-curl php7.3-intl php7.3-gd \
-        php7.3-mbstring php7.3-zip php7.3-mysql php7.3-soap apache2 composer \
+php7_3_packages=(
+  php7.3-fpm php7.3-xml php7.3-curl php7.3-intl php7.3-gd php7.3-imagick
+  php7.3-mbstring php7.3-zip php7.3-mysql php7.3-soap
+)
+
+php5_6_packages=(
+  php5.6-fpm php5.6-xml php5.6-curl php5.6-intl php5.6-gd php5.6-imagick
+  php5.6-mbstring php5.6-zip php5.6-mysql php5.6-soap php5.6-mcrypt
+)
+
+apt-get install --yes --no-install-recommends \
+	"${php7_3_packages[@]}" \
+	"${php5_6_packages[@]}" \
+	apache2 composer \
 	default-mysql-client pv tree
 
 # Apache setup
@@ -21,16 +32,15 @@ a2ensite  --quiet devbox
 
 systemctl reload apache2
 
-# php-fpm setup
-(
-  pool_d=/etc/php/7.3/fpm/pool.d
-  if [ -f "$pool_d"/www.conf ]; then
-      mv "$pool_d"/www.conf "$pool_d"/www.conf.disabled
-  fi
-  cp php-fpm.conf "$pool_d"/
-)
+# PHP setup
+for version in 5.6 7.3; do
+  pool_dir=/etc/php/"$version"/fpm/pool.d
 
-systemctl restart php7.3-fpm
+  mv "$pool_dir"/www.conf "$pool_dir"/www.conf.bak
+  cp php"$version"-fpm-pool.conf "$pool_dir"/vagrant.conf
+
+  systemctl restart php"$version"-fpm
+done
 
 # Config for system utils
 

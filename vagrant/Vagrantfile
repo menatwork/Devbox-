@@ -11,22 +11,22 @@ Vagrant.configure("2") do |config|
 
   config.vm.network "private_network", ip: "192.168.137.2"
 
-  devbox_synced_folder config, ".", "/devbox/vagrant"
+  Devbox.synced_folder config, ".", "/devbox/vagrant"
 
-  devbox_synced_folder config, :host_webroot_dir, "/projects"
-  devbox_synced_folder config, :host_cache_dir, "/devbox/home-vagrant-cache"
+  Devbox.synced_folder config, :host_webroot_dir, "/projects"
+  Devbox.synced_folder config, :host_cache_dir, "/devbox/home-vagrant-cache"
 
-  devbox_synced_folder config,
-                       devbox_join_state_dir("apache2-sites"),
+  Devbox.synced_folder config,
+                       Devbox.state_dir("apache2-sites"),
                        "/devbox/apache2-sites"
 
   config.vm.provider "virtualbox" do |virtualbox|
     virtualbox.cpus = dc[:cores]
     virtualbox.memory = dc[:memory]
-    virtualbox.default_nic_type = "virtio" if linux?
+    virtualbox.default_nic_type = "virtio" if Devbox.linux?
   end
 
-  if linux?
+  if Devbox.linux?
     config.vm.provider "libvirt" do |libvirt|
       libvirt.cpus = dc[:cores]
       libvirt.memory = dc[:memory]

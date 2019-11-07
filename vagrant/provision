@@ -44,7 +44,9 @@ done
 
 # Config for system utils
 
-cp tmux.conf       /etc/tmux.conf
+cp tmux.conf   /etc/tmux.conf
+cp vimrc.local /etc/vim/vimrc.local
+
 cp ssh_known_hosts /etc/ssh/ssh_known_hosts
 
 rm -rf /home/vagrant/.cache

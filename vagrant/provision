@@ -43,4 +43,4 @@ ln -s /devbox/home-vagrant-cache /home/vagrant/.cache
 printf "\n\n# Added by devbox provisioning script\ncd /projects\n" \
        >> /home/vagrant/.bashrc
 
-echo "devbox: provisioning complete\n"
+echo "provisioning complete"

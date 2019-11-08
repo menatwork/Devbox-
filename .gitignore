@@ -3,3 +3,6 @@
 
 # Local Vagrant state directory
 /vagrant/.vagrant/
+
+# Packaged Vagrant boxes
+*.box

@@ -42,4 +42,9 @@ Vagrant.configure("2") do |config|
     trigger.name = "Restart services that depend on host mounts"
     trigger.run_remote = {inline: "systemctl restart apache2 php7.3-fpm php5.6-fpm"}
   end
+
+  config.trigger.before :destroy do |trigger|
+    trigger.name = "Preserve PHP sessions"
+    trigger.run_remote = {inline: "/devbox/vagrant/guest-preserve-php-sessions"}
+  end
 end

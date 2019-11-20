@@ -1,0 +1,20 @@
+#!/bin/bash
+set -eu
+
+DEVBOX_CONTAINER=devbox
+DEVBOX_WEB_ROOT="$HOME/code"
+
+if [[ ! "$PWD" =~ ^"$DEVBOX_WEB_ROOT" ]]; then
+    >&2 echo "$(basename "$0"): error: you are not in DEVBOX_WEB_ROOT!"
+    exit 1
+fi
+
+pwd_in_container="/projects/${PWD/#$DEVBOX_WEB_ROOT\/}"
+
+docker exec				\
+       --interactive			\
+       --tty				\
+       --workdir="$pwd_in_container"	\
+       --user=www-data			\
+       "$DEVBOX_CONTAINER"		\
+       composer "$@"

@@ -1,0 +1,7 @@
+#!/bin/sh
+set -e
+
+# mysqld's unix socket goes in this directory
+install -m 755 -o mysql -g root -d /var/run/mysqld
+
+exec /usr/sbin/mysqld --user=mysql --init-file=/mariadb_init.sql

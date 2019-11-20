@@ -3,7 +3,11 @@ import os
 import shlex
 import subprocess
 import sys
+import zlib
 
+
+def crc32(data):
+    return hex(zlib.crc32(bytes(data, "utf-8"))).replace("0x", "")
 
 class Command(object):
     def __init__(self, function, short_help):
@@ -75,6 +79,21 @@ def devbox_edit(args):
     vagrant_shim("ssh", "--", "sudo", "systemctl", "reload", "apache2")([])
 
 
+def devbox_ramdisk(args):
+    if len(args) < 1:
+        print_error("missing directories")
+        print_usage("dir2ram", "<directory...>")
+        sys.exit(1)
+
+    for dir_arg in args:
+        abs_path      = os.path.abspath(dir_arg)
+        abs_path_hash = crc32(abs_path)
+        ramdisk_dir   = os.path.join("/devbox/ramdisk", abs_path_hash)
+
+        print_info("removing {}".format(dir_arg))
+        print_info("linking {} to {}".format(dir_arg, ramdisk_dir))
+
+
 def devbox_version(args):
     print('devbox 0.1')
 
@@ -98,6 +117,9 @@ COMMANDS = {
 
     "edit": COMMAND_EDIT,
     "e": Alias(COMMAND_EDIT, "e"),
+
+    "ramdisk": Command(devbox_ramdisk,
+                       "delete directories and link them to a ramdisk in the VM"),
 
     "version": Command(devbox_version, "display tool version")
 }

@@ -2,6 +2,12 @@
 set -eu
 cd /devbox/vagrant/files
 
+cat > /etc/apt/apt.conf.d/99-apt-cache <<EOF
+# provisioned by devbox
+Acquire::http  { Proxy "http://192.168.19.45:3142"; };
+Acquire::https { Proxy "https://"; };
+EOF
+
 # This also does an apt-get update automatically.
 apt-add-repository --yes ppa:ondrej/php
 
@@ -27,7 +33,7 @@ apt-get install --yes --no-install-recommends \
 cp apache2-devbox.conf       /etc/apache2/conf-available/devbox.conf
 cp apache2-devbox-vhost.conf /etc/apache2/sites-available/devbox.conf
 
-a2enmod   --quiet proxy_fcgi setenvif rewrite headers
+a2enmod   --quiet proxy_fcgi setenvif rewrite headers vhost_alias
 a2enconf  --quiet php7.3-fpm devbox
 a2dissite --quiet 000-default
 a2ensite  --quiet devbox
@@ -44,6 +50,12 @@ for version in 5.6 7.3; do
   systemctl restart php"$version"-fpm
 done
 
+if [ -f /devbox/cache/php-sessions.tar ]; then
+    echo "restoring PHP sessions"
+    tar -C /var/lib/php/sessions -xf /devbox/cache/php-sessions.tar
+    rm /devbox/cache/php-sessions.tar
+fi
+
 # Config for system utils
 
 cp tmux.conf   /etc/tmux.conf
@@ -53,6 +65,9 @@ cp ssh_known_hosts /etc/ssh/ssh_known_hosts
 
 rm -rf /home/vagrant/.cache
 ln -s /devbox/cache /home/vagrant/.cache
+
+printf "\n\n# Added by devbox provisioning script\nexport EDITOR=vim\n" \
+       >> /home/vagrant/.profile
 
 printf "\n\n# Added by devbox provisioning script\ncd /projects\n" \
        >> /home/vagrant/.bashrc

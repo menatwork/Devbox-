@@ -1,4 +1,0 @@
-#!/bin/sh
-if [ -d /var/lib/php/sessions ]; then
-    tar -C /var/lib/php/sessions -cf /devbox/vagrant/php-sessions.tar .
-fi

@@ -1,8 +1,0 @@
-#!/usr/bin/make -f
-%:
-	dh $@
-override_dh_auto_install:
-	install -D -m 0644 dnsmasq.conf \
-		$$(pwd)/debian/devbox/etc/dnsmasq.d/devbox
-	install -D -m 0644 NetworkManager-dnsmasq.conf \
-		$$(pwd)/debian/devbox/etc/NetworkManager/conf.d/devbox.conf

@@ -153,11 +153,6 @@ static int vhost_devbox_translate_name(request_rec *req) {
 		return DECLINED;
 	}
 
-	ap_log_rerror(__FILE__, 0, 0, 0, 0, req,
-		      "%s: DocumentRoot remapped to %s",
-		      req->hostname,
-		      new_doc_root);
-
 	req->filename = apr_pstrcat(req->pool, new_doc_root, req->uri, NULL);
 	ap_set_context_info(req, NULL, new_doc_root);
 	ap_set_document_root(req, new_doc_root);

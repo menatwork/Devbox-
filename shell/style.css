@@ -1,0 +1,89 @@
+:root {
+  --color-fg         : #111;
+  --color-bg	     : #fff;
+  --color-bg2	     : #f7f7f7;
+  --color-border     : #000;
+
+  --font-size-big    : 18pt;
+  --font-size-normal : 11pt;
+}
+
+body {
+  font-size: var(--font-size-normal);
+  background: var(--color-bg);
+  color: var(--color-fg);
+  min-height: 100vh;
+}
+
+body, code {
+  display: flex;
+  flex-flow: column;
+  font-family: Iosevka, monospace;
+}
+
+body, h1 {
+  margin: 0;
+}
+
+a {
+  color: var(--color-fg);
+}
+
+.page-header, .page-footer {
+  color: #fff;
+  background: #111;
+  padding: .5em 1.1em;
+}
+
+.page-footer {
+}
+
+.page-main {
+  flex-grow: 1;
+  padding: .5em .8em;
+}
+
+.page-title {
+  font-size: var(--font-size-big);
+  font-weight: 700;
+}
+
+.vhosts {
+  margin: .5em 0;
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-size-normal);
+}
+
+.vhosts th {
+  font-size: var(--font-size-normal);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.vhosts td {
+  white-space: nowrap;
+}
+
+.vhosts th:nth-child(3),
+.vhosts td:nth-child(3) { text-align: right; }
+
+.vhosts td:not(:last-child) {
+  width: 0;
+}
+
+.vhosts tr:nth-child(odd) td {
+  background: var(--color-bg2);
+}
+
+.vhosts td, .vhosts th {
+  text-align: left;
+  padding: .3em 1em;
+}
+
+.project-icon {
+  width: 16px;
+}
+
+.project-links a:not(:first-child) {
+  margin-left: .3em;
+}

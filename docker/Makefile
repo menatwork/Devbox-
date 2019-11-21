@@ -6,7 +6,7 @@ mysql_volume  := $(image_name)-mysql
 
 host_projects_dir := $(HOME)/code
 
-.PHONY: run bash top
+.PHONY: run bash
 run: .build
 	docker run					\
 		-v $(host_projects_dir):/projects	\

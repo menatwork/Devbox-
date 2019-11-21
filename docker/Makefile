@@ -1,30 +1,34 @@
-image_name    := devbox
-image_version := latest
-image_tag     := $(image_name):$(image_version)
+image_name		:= devbox
+image_version		:= latest
+image_tag		:= $(image_name):$(image_version)
+container_name		:= $(image_name)
 
-mysql_volume  := $(image_name)-mysql
+mysql_volume		:= $(image_name)-mysql
 
-host_projects_dir := $(HOME)/code
+host_cache_dir		:= $(HOME)/.cache/devbox
+host_projects_dir	:= $(HOME)/code
 
 .PHONY: run bash
 run: .build
-	docker run					\
-		-v $(host_projects_dir):/projects	\
-		-v $(mysql_volume):/var/lib/mysql	\
-		-p 80:80				\
-		-p 3306:3306				\
-		-p 8081:8081				\
-		--name $(image_name)			\
-		--rm=true				\
-		$(image_tag)
+	docker run								\
+		--volume=$(host_cache_dir)/composer:/var/www/.composer/cache	\
+		--volume=$(host_projects_dir):/projects				\
+		--volume=$(mysql_volume):/var/lib/mysql				\
+		--publish 80:80							\
+		--publish 1080:1080						\
+		--publish 3306:3306						\
+		--publish 8081:8081						\
+		--name=$(container_name)					\
+		--rm=true							\
+		$(container_name)
 
 bash:
-	docker exec --interactive --tty $(image_name) /bin/bash
+	docker exec --interactive --tty $(container_name) /bin/bash
 
 .build: Dockerfile mod_vhost_devbox/mod_vhost_devbox.so
-	docker build \
-		--build-arg DOCKERDEV_UID=$(shell id -u) \
-		-t $(image_tag) \
+	docker build						\
+		--build-arg DOCKERDEV_UID=$(shell id -u)	\
+		--tag=$(image_tag)				\
 		.
 	touch .build
 

@@ -16,7 +16,10 @@ RUN export DEBIAN_FRONTEND=noninteractive \
 	php7.3-mbstring php7.3-zip php7.3-mysql php7.3-soap php7.3-yaml \
 	\
 	php5.6-fpm php5.6-xml php5.6-curl php5.6-intl php5.6-gd php5.6-imagick \
-	php5.6-mbstring php5.6-zip php5.6-mysql php5.6-soap php5.6-mcrypt
+	php5.6-mbstring php5.6-zip php5.6-mysql php5.6-soap php5.6-mcrypt \
+	\
+	build-essential ruby-dev libsqlite3-dev \
+	&& gem install mailcatcher
 
 COPY files.apt-post/ /
 COPY mod_vhost_devbox/mod_vhost_devbox.so /usr/local/lib/apache2/modules/

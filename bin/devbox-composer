@@ -1,7 +1,7 @@
 #!/bin/bash
 set -eu
 
-DEVBOX_CONTAINER=devbox
+DEVBOX_IMAGE=devbox
 DEVBOX_WEB_ROOT="$HOME/code"
 
 if [[ ! "$PWD" =~ ^"$DEVBOX_WEB_ROOT" ]]; then
@@ -11,10 +11,14 @@ fi
 
 pwd_in_container="/projects/${PWD/#$DEVBOX_WEB_ROOT\/}"
 
-docker exec				\
-       --interactive			\
-       --tty				\
-       --workdir="$pwd_in_container"	\
-       --user=www-data			\
-       "$DEVBOX_CONTAINER"		\
+docker run					\
+       --interactive				\
+       --tty					\
+       --workdir="$pwd_in_container"		\
+       --user=www-data				\
+       --volume="$DEVBOX_WEB_ROOT:/projects"    \
+       --volume="$HOME/.cache/devbox/composer:/var/www/.composer/cache" \
+       --volume="$SSH_AUTH_SOCK:/.ssh-agent"	\
+       --env "SSH_AUTH_SOCK=/.ssh-agent"	\
+       "$DEVBOX_IMAGE"			        \
        composer "$@"

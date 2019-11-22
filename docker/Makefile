@@ -7,7 +7,7 @@ volume_mysql		:= $(image_name)-mysql
 volume_composer		:= $(image_name)-composer
 volume_sessions		:= $(image_name)-sessions
 
-host_projects_dir	:= $(HOME)/code
+host_projects_dir	:= $(PWD)/../..
 host_devbox_shell_dir   := $(PWD)/../shell
 
 .PHONY: run bash

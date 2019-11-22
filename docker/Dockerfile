@@ -25,9 +25,7 @@ COPY files.apt-post/ /
 COPY mod_vhost_devbox/mod_vhost_devbox.so /usr/local/lib/apache2/modules/
 
 RUN true \
-	&& a2enmod   --quiet proxy_fcgi setenvif rewrite headers vhost_devbox \
-	&& a2enconf  --quiet php7.3-fpm devbox \
-	&& a2dissite --quiet 000-default \
-	&& a2ensite  --quiet devbox
+	&& a2enmod  --quiet proxy_fcgi setenvif rewrite headers vhost_devbox \
+	&& a2enconf --quiet php7.3-fpm devbox
 
 CMD ["/usr/bin/supervisord", "-c", "/opt/devbox/supervisord.conf"]

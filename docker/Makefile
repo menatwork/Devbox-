@@ -3,19 +3,21 @@ image_version		:= latest
 image_tag		:= $(image_name):$(image_version)
 container_name		:= $(image_name)
 
-mysql_volume		:= $(image_name)-mysql
+volume_mysql		:= $(image_name)-mysql
+volume_composer		:= $(image_name)-composer
+volume_sessions		:= $(image_name)-sessions
 
-host_cache_dir		:= $(HOME)/.cache/devbox
 host_projects_dir	:= $(HOME)/code
 host_devbox_shell_dir   := $(PWD)/../shell
 
 .PHONY: run bash
 run: .build
 	docker run								\
-		--volume=$(host_cache_dir)/composer:/var/www/.composer/cache	\
+		--volume=$(volume_composer):/var/www/.composer/cache		\
+		--volume=$(volume_mysql):/var/lib/mysql				\
+		--volume=$(volume_sessions):/var/lib/php/sessions		\
 		--volume=$(host_projects_dir):/projects				\
 		--volume=$(host_devbox_shell_dir):/shell			\
-		--volume=$(mysql_volume):/var/lib/mysql				\
 		--publish 80:80							\
 		--publish 1080:1080						\
 		--publish 3306:3306						\

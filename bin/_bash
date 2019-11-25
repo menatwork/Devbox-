@@ -1,5 +1,5 @@
 #!/bin/bash
-docker exec							\
+exec docker exec						\
        --interactive						\
        --tty							\
        "$devbox_container_name"					\

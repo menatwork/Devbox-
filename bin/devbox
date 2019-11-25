@@ -5,20 +5,30 @@ _default_projects_dir() {
   realpath "$script_dir/../.."
 }
 
+_load_dot_env() {
+  local env_file="$devbox_repo_dir"/.env
+
+  if [[ -f "$env_file" ]]; then
+    . "$env_file"
+  fi
+}
+
 _main() {
+  # Non-configurable directories
   script_dir="$(dirname "$0")"
+  devbox_repo_dir="$(realpath "$script_dir"/..)"
+  devbox_shell_dir="$devbox_repo_dir"/shell
 
-  devbox_image_name=devbox
-
-  devbox_image_tag="$devbox_image_name":latest
-  devbox_container_name="$devbox_image_name"
+  _load_dot_env
 
   # Configurable directories
   devbox_projects_dir="${devbox_projects_dir:-$(_default_projects_dir)}"
+  devbox_ssh_dir="$devbox_ssh_dir"
 
-  # Non-configurable directories
-  devbox_repo_dir="$(realpath "$script_dir"/..)"
-  devbox_shell_dir="$devbox_repo_dir"/shell
+  devbox_image_name=devbox
+  devbox_container_name="$devbox_image_name"
+
+  devbox_image_tag="$devbox_image_name":latest
 
   # Names of Docker volumes for persistent data
   devbox_volume_composer="$devbox_image_name"-composer

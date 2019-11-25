@@ -6,6 +6,7 @@ exec docker run								\
        --volume="$devbox_volume_composer":/var/www/.composer/cache	\
        --volume="$devbox_volume_mysql":/var/lib/mysql			\
        --volume="$devbox_volume_sessions":/var/lib/php/sessions		\
+       --volume="$devbox_ssh_dir":/var/www/.ssh				\
        --volume="$devbox_shell_dir":/shell				\
        --volume="$devbox_projects_dir":/projects			\
        --publish 80:80							\

@@ -1,7 +1,10 @@
 #!/bin/bash
+#
+# /opt/devbox/install -- setup script for the devbox image
+#
 set -eu
 
-# these should stay in the final image
+# This set of packages will be installed and kept in the image.
 packages=(
   supervisor apache2 mariadb-server composer
 
@@ -20,10 +23,15 @@ packages=(
   ruby
 )
 
-# these should be removed after they're no longer needed
+# These packages will be installed, kept around for any builds that
+# require them and then removed to keep the image as small as
+# possible.
 packages_build_deps=(
   # build requirements for mailcatcher
   build-essential ruby-dev libsqlite3-dev
+
+  # build requirements for mod_vhost_devbox
+  apache2-dev libyaml-dev
 )
 
 # skip all interactive package configuration
@@ -38,7 +46,9 @@ apt-get install -qq --no-install-recommends \
 
 gem install mailcatcher
 
-# clean up anything that isn't needed in the final image
+make -C /tmp/mod_vhost_devbox install
+
+# Remove build deps and package lists
 apt-get purge -qq "${packages_build_deps[@]}"
 apt-get autoremove -qq --purge
 rm -rf /var/lib/apt/lists/*

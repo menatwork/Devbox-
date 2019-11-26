@@ -3,7 +3,7 @@ _exec_docker exec				\
        --interactive				\
        --tty					\
        --user www-data				\
-       --env SSH_AUTH_SOCK=/tmp/ssh-agent.sock	\
-       --workdir /var/www/.ssh			\
+       --env SSH_AUTH_SOCK=//tmp/ssh-agent.sock	\
+       --workdir //var/www/.ssh			\
        "$devbox_container_name"			\
        ssh-add "$@"

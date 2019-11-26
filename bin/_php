@@ -3,7 +3,7 @@ workdir="$(devbox_pwd_in_container)"
 _exec_docker exec		\
        --interactive		\
        --tty			\
-       --workdir "$workdir"	\
+       --workdir /"$workdir"	\
        --user www-data		\
        "$devbox_image_name"	\
        php "$@"

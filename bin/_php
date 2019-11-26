@@ -1,10 +1,9 @@
 #!/bin/bash
 workdir="$(devbox_pwd_in_container)"
-docker run						\
-       --interactive					\
-       --tty						\
-       --workdir="$workdir"				\
-       --user=www-data					\
-       --volume="$devbox_projects_dir:/projects"	\
-       "$devbox_image_name"				\
+_exec_docker exec		\
+       --interactive		\
+       --tty			\
+       --workdir "$workdir"	\
+       --user www-data		\
+       "$devbox_image_name"	\
        php "$@"

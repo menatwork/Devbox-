@@ -1,6 +1,14 @@
 #!/bin/bash
 set -euo pipefail
 
+_exec_docker() {
+  if [[ "$(uname -o)" == Msys ]]; then
+    exec winpty docker "$@"
+  else
+    exec docker "$@"
+  fi
+}
+
 _default_projects_dir() {
   realpath "$script_dir/../.."
 }

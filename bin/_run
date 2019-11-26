@@ -1,18 +1,15 @@
 #!/bin/bash
-#
-# devbox-run -- run the devbox container
-#
-exec docker run								\
-       --volume="$devbox_volume_composer":/var/www/.composer/cache	\
-       --volume="$devbox_volume_mysql":/var/lib/mysql			\
-       --volume="$devbox_volume_sessions":/var/lib/php/sessions		\
-       --volume="$devbox_ssh_dir":/var/www/.ssh				\
-       --volume="$devbox_shell_dir":/shell				\
-       --volume="$devbox_projects_dir":/projects			\
+_exec_docker run							\
+       --volume "$devbox_volume_composer":/var/www/.composer/cache	\
+       --volume "$devbox_volume_mysql":/var/lib/mysql			\
+       --volume "$devbox_volume_sessions":/var/lib/php/sessions		\
+       --volume "$devbox_ssh_dir":/var/www/.ssh				\
+       --volume "$devbox_shell_dir":/shell				\
+       --volume "$devbox_projects_dir":/projects			\
        --publish 80:80							\
        --publish 1080:1080						\
        --publish 3306:3306						\
        --publish 8081:8081						\
-       --name="$devbox_container_name"					\
-       --rm=true							\
+       --name "$devbox_container_name"					\
+       --rm								\
        "$devbox_image_tag"

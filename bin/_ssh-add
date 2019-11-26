@@ -1,5 +1,5 @@
 #!/bin/bash
-docker exec					\
+_exec_docker exec				\
        --interactive				\
        --tty					\
        --user www-data				\

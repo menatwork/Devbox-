@@ -1,13 +1,10 @@
 #!/bin/bash
 workdir="$(devbox_pwd_in_container)"
-docker run							\
-       --interactive						\
-       --tty							\
-       --workdir="$workdir"					\
-       --user=www-data						\
-       --volume="$devbox_projects_dir:/projects"		\
-       --volume="$devbox_volume_composer:/var/www/.composer"	\
-       --volume="$SSH_AUTH_SOCK:/.ssh-agent"			\
-       --env "SSH_AUTH_SOCK=/.ssh-agent"			\
-       "$devbox_image_name"					\
+_exec_docker exec				\
+       --interactive				\
+       --tty					\
+       --workdir "$workdir"			\
+       --user www-data				\
+       --env SSH_AUTH_SOCK=/tmp/ssh-agent.sock	\
+       "$devbox_image_name"			\
        composer "$@"

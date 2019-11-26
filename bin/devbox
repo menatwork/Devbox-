@@ -1,12 +1,24 @@
 #!/bin/bash
 set -euo pipefail
 
+devbox_os="$(uname -o)"
+
 _exec_docker() {
-  if [[ "$(uname -o)" == Msys ]]; then
+  if [[ "$devbox_os" == Msys ]]; then
     exec winpty docker "$@"
   else
     exec docker "$@"
   fi
+}
+
+_windows_path_hack() {
+  if [[ "$devbox_os" == Msys && "$1" =~ ^"" ]]; then
+      local path_with_prefix="${1/#\/c/C:}"
+      local path_with_prefix_and_backslashes="${path_with_prefix//\//\\/}"
+      set -- "$path_with_prefix_and_backslashes"
+  fi
+
+  echo "$1"
 }
 
 _default_projects_dir() {
@@ -25,7 +37,7 @@ _main() {
   # Non-configurable directories
   script_dir="$(dirname "$0")"
   devbox_repo_dir="$(realpath "$script_dir"/..)"
-  devbox_shell_dir="$devbox_repo_dir"/shell
+  devbox_shell_dir="$(_windows_path_hack "$devbox_repo_dir"/shell)"
 
   _load_dot_env
 

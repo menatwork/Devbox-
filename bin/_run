@@ -1,5 +1,7 @@
 #!/bin/bash
-_exec_docker run							\
+# ! KEEP THE DOUBLE-SLASHES !
+# They're required for Windows compatibility.
+devbox_docker run							\
        --volume "$devbox_volume_composer"://var/www/.composer/cache	\
        --volume "$devbox_volume_mysql"://var/lib/mysql			\
        --volume "$devbox_volume_sessions"://var/lib/php/sessions	\
@@ -10,6 +12,6 @@ _exec_docker run							\
        --publish 1080:1080						\
        --publish 3306:3306						\
        --publish 8081:8081						\
-       --name "$devbox_container_name"					\
+       --name "$devbox_container"					\
        --rm								\
-       "$devbox_image_tag"
+       "$devbox_image"

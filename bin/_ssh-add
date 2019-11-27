@@ -1,9 +1,11 @@
 #!/bin/bash
-_exec_docker exec				\
+# ! KEEP THE DOUBLE-SLASHES !
+# They're required for Windows compatibility.
+devbox_docker exec				\
        --interactive				\
        --tty					\
        --user www-data				\
        --env SSH_AUTH_SOCK=//tmp/ssh-agent.sock	\
        --workdir //var/www/.ssh			\
-       "$devbox_container_name"			\
+       "$devbox_container"			\
        ssh-add "$@"

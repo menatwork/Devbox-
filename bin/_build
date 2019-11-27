@@ -1,5 +1,5 @@
 #!/bin/bash
-_exec_docker build			\
+devbox_docker build			\
      --build-arg DEVBOX_UID="$(id -u)"	\
      --tag "$devbox_image_tag"		\
      "$devbox_repo_dir"/docker

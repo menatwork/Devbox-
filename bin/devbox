@@ -1,18 +1,81 @@
 #!/bin/bash
+#
+# devbox -- core devbox CLI shell script
+#
+# This script sets up the environment and provides functions for other
+# scripts in the bin directory (_build, _run, etc), which are not
+# meant to be called directly.
+#
+# Regarding functions in this file:
+#
+# All functions prefixed with a _ are not meant to be used outside of
+# this file. Command scripts (bin/_*) should only use functions
+# prefixed with "devbox_".
+#
 set -euo pipefail
 
-devbox_os="$(uname -o)"
+# -- Command script functions --------------------------------------------------
 
-_exec_docker() {
-  if [[ "$devbox_os" == Msys ]]; then
-    exec winpty docker "$@"
+# Run a Docker command through the appropriate wrapper, if any.
+#
+# When we're running on Windows in Git bash, we need to call docker
+# through winpty to provide an interactive terminal.
+devbox_docker() {
+  case "$devbox_os" in
+    # Window/git bash
+    Msys) winpty docker "$@" ;;
+
+    # Probably Linux or macOS
+    *) docker "$@" ;;
+  esac
+}
+
+# Print an info message.
+devbox_info() {
+  if [[ -v _scriptname ]]; then
+    printf "\e[1mdevbox %s:\e[0m %s\n" "$_scriptname" "$@"
   else
-    exec docker "$@"
+    printf "\e[1mdevbox:\e[0m %s\n" "$@"
   fi
 }
 
+# Print an error message.
+devbox_error() {
+  if [[ -v _scriptname ]]; then
+    >&2 printf "\e[1;31mdevbox %s:\e[0;31m %s\e[0m\n" "$_scriptname" "$@"
+  else
+    >&2 printf "\e[1;31mdevbox:\e[0;31m %s\e[0m\n" "$@"
+  fi
+}
+
+# Print an error message and exit with a failure status code.
+devbox_panic() {
+  devbox_error "$@"
+  exit 1
+}
+
+# Translate $PWD to its corresponding path in the devbox container.
+#
+# This will print an error and exit with status code 1 if $PWD isn't
+# in $devbox_projects_dir.
+devbox_pwd_in_container() {
+  if [[ ! "$PWD" =~ ^"$devbox_projects_dir" ]]; then
+      devbox_panic "you are not in $devbox_projects_dir"
+  fi
+
+  echo "/projects/${PWD/#$devbox_projects_dir\/}"
+}
+
+# -- Internal functions --------------------------------------------------------
+
+# Translate Msys-style file system paths to Windows paths.
+#
+# E.g., /c/Public/Foobar → C:\Public\Foobar
+#
+# Paths are returned unchanged if this script isn't running under Git
+# bash, or if they don't start with /c/.
 _windows_path_hack() {
-  if [[ "$devbox_os" == Msys && "$1" =~ ^"" ]]; then
+  if [[ "$devbox_os" == Msys && "$1" =~ ^"/c/" ]]; then
       local path_with_prefix="${1/#\/c/C:}"
       local path_with_prefix_and_backslashes="${path_with_prefix//\//\\/}"
       set -- "$path_with_prefix_and_backslashes"
@@ -21,11 +84,9 @@ _windows_path_hack() {
   echo "$1"
 }
 
-_default_projects_dir() {
-  realpath "$script_dir/../.."
-}
-
-_load_dot_env() {
+# (satellite function for _main)
+# Sources the repo's ".env" file if it exists.
+_main_load_dot_env() {
   local env_file="$devbox_repo_dir"/.env
 
   if [[ -f "$env_file" ]]; then
@@ -33,30 +94,33 @@ _load_dot_env() {
   fi
 }
 
+# The script entry point. This sets up shell variables and defers
+# execution to the appropriate command script.
 _main() {
+  devbox_os="$(uname -o)"
+
   # Non-configurable directories
   script_dir="$(dirname "$0")"
   devbox_repo_dir="$(realpath "$script_dir"/..)"
   devbox_shell_dir="$(_windows_path_hack "$devbox_repo_dir"/shell)"
 
-  _load_dot_env
+  _main_load_dot_env
 
   # Configurable directories
-  devbox_projects_dir="${devbox_projects_dir:-$(_default_projects_dir)}"
+  devbox_projects_dir="${devbox_projects_dir:-$(realpath "$script_dir"/../..)}"
   devbox_ssh_dir="$devbox_ssh_dir"
 
-  devbox_image_name=devbox
-  devbox_container_name="$devbox_image_name"
-
-  devbox_image_tag="$devbox_image_name":latest
+  devbox_container=devbox
+  devbox_image=gitlab.men-at-work.de:4774/entwicklung/devbox
+  devbox_image_tag="$devbox_image":latest
 
   # Names of Docker volumes for persistent data
-  devbox_volume_composer="$devbox_image_name"-composer
-  devbox_volume_mysql="$devbox_image_name"-mysql
-  devbox_volume_sessions="$devbox_image_name"-sessions
+  devbox_volume_composer=devbox-composer
+  devbox_volume_mysql=devbox-mysql
+  devbox_volume_sessions=devbox-sessions
 
   if [[ $# -lt 1 ]]; then
-      print_error "missing command"
+      devbox_error "missing command"
       exit 1
   fi
 
@@ -70,41 +134,6 @@ _main() {
   shift
 
   . "$_script"
-}
-
-devbox_info() {
-  if [[ -v _scriptname ]]; then
-    printf "\e[1mdevbox %s:\e[0m %s\n" "$_scriptname" "$@"
-  else
-    printf "\e[1mdevbox:\e[0m %s\n" "$@"
-  fi
-}
-
-devbox_error() {
-  if [[ -v _scriptname ]]; then
-    >&2 printf "\e[1;31mdevbox %s:\e[0;31m %s\e[0m\n" "$_scriptname" "$@"
-  else
-    >&2 printf "\e[1;31mdevbox:\e[0;31m %s\e[0m\n" "$@"
-  fi
-}
-
-devbox_panic() {
-  devbox_error "$@"
-  exit 1
-}
-
-#
-# Translate $PWD to its corresponding path in the devbox container.
-#
-# This will print an error and exit with status code 1 if $PWD isn't
-# in a directory mapped into the container.
-#
-devbox_pwd_in_container() {
-  if [[ ! "$PWD" =~ ^"$devbox_projects_dir" ]]; then
-      devbox_panic "you are not in $devbox_projects_dir"
-  fi
-
-  echo "/projects/${PWD/#$devbox_projects_dir\/}"
 }
 
 _main "$@"

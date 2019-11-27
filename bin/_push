@@ -1,3 +1,2 @@
 #!/bin/bash
-devbox_docker image tag "$devbox_image_name" "$devbox_image_remote"
-devbox_docker image push "$devbox_image_remote"
+devbox_docker image push "$devbox_image"

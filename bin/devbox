@@ -97,21 +97,33 @@ _main_load_dot_env() {
 # The script entry point. This sets up shell variables and defers
 # execution to the appropriate command script.
 _main() {
+  if [[ $# -lt 1 ]]; then
+      devbox_panic "missing command"
+  fi
+
+  _script_dir="$(dirname "$0")"
+
+  _scriptname="$1"
+  _script="$_script_dir/_$1"
+
+  if [[ ! -f "$_script" ]]; then
+      devbox_panic "command not found"
+  fi
+
+  shift
+
   devbox_os="$(uname -o)"
 
   # Non-configurable directories
-  script_dir="$(dirname "$0")"
-  devbox_repo_dir="$(realpath "$script_dir"/..)"
+  devbox_repo_dir="$(realpath "$_script_dir"/..)"
   devbox_shell_dir="$(_windows_path_hack "$devbox_repo_dir"/shell)"
 
   _main_load_dot_env
 
-  # Configurable directories
-  devbox_projects_dir="${devbox_projects_dir:-$(realpath "$script_dir"/../..)}"
-  devbox_ssh_dir="$devbox_ssh_dir"
+  devbox_docker_registry=gitlab.men-at-work.de:4774
 
   devbox_container=devbox
-  devbox_image=gitlab.men-at-work.de:4774/entwicklung/devbox
+  devbox_image="$devbox_docker_registry"/entwicklung/devbox
   devbox_image_tag="$devbox_image":latest
 
   # Names of Docker volumes for persistent data
@@ -119,19 +131,11 @@ _main() {
   devbox_volume_mysql=devbox-mysql
   devbox_volume_sessions=devbox-sessions
 
-  if [[ $# -lt 1 ]]; then
-      devbox_error "missing command"
-      exit 1
+  if [[ "$_scriptname" != setup ]]; then
+      # Configurable directories
+      devbox_projects_dir="${devbox_projects_dir:-$(realpath "$script_dir"/../..)}"
+      devbox_ssh_dir="$devbox_ssh_dir"
   fi
-
-  _scriptname="$1"
-  _script="$script_dir/_$1"
-
-  if [[ ! -f "$_script" ]]; then
-      devbox_panic "command not found"
-  fi
-
-  shift
 
   . "$_script"
 }

@@ -48,12 +48,6 @@ devbox_error() {
   fi
 }
 
-# Print an error message and exit with a failure status code.
-devbox_panic() {
-  devbox_error "$@"
-  exit 1
-}
-
 # Translate $PWD to its corresponding path in the devbox container.
 #
 # This will print an error and exit with status code 1 if $PWD isn't
@@ -62,7 +56,8 @@ devbox_pwd_in_container() {
   local real_projects_dir="$(_path_windows_to_unix "$devbox_projects_dir")"
 
   if [[ ! "$PWD" =~ ^"$real_projects_dir" ]]; then
-      devbox_panic "you are not in $devbox_projects_dir"
+      devbox_error "you are not in $devbox_projects_dir"
+      exit 1
   fi
 
   printf %s "/projects/${PWD/#$real_projects_dir\/}"
@@ -119,17 +114,21 @@ _main_load_dot_env() {
 # The script entry point. This sets up shell variables and defers
 # execution to the appropriate command script.
 _main() {
-  if [[ $# -lt 1 ]]; then
-      devbox_panic "missing command"
-  fi
-
   _script_dir="$(dirname "$0")"
+
+  if [[ $# -lt 1 ]]; then
+      devbox_error "missing command"
+      . "$_script_dir"/_help
+      exit 1
+  fi
 
   _scriptname="$1"
   _script="$_script_dir/_$1"
 
   if [[ ! -f "$_script" ]]; then
-      devbox_panic "command not found"
+      devbox_error "command not found"
+      . "$_script_dir"/_help
+      exit 1
   fi
 
   shift

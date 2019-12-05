@@ -1,0 +1,17 @@
+#!/bin/bash
+echo -e "
+\e[1mDEVBOX-HILFE\e[0m
+
+  \e[1mInstallation & Benutzung\e[0m
+    setup    -- Initiales Setup ausführen
+    run      -- den devbox-Container ausführen
+    pull     -- das neueste devbox-Image vom GitLab-Registry runterladen
+    exec     -- Befehle im Container ausführen
+    composer -- Composer im Container ausführen
+    ssh-add  -- Schlüssel zum Container-eigenen ssh-agent hinzufügen
+    help     -- Diesen Hilfetext anzeigen
+
+  \e[1mWartung\e[0m
+    build    -- ein neues devbox-Image bauen
+    push     -- gebautes devbox-Image ins GitLab-Registry pushen
+"

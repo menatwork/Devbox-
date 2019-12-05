@@ -1,6 +1,0 @@
-#!/bin/bash
-devbox_docker exec		\
-       --interactive		\
-       --tty			\
-       "$devbox_container"	\
-       bash "$@"

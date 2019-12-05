@@ -8,5 +8,5 @@ devbox_docker exec		\
        --tty			\
        --workdir /"$workdir"	\
        --user www-data		\
-       "$devbox_image"		\
+       "$devbox_container"	\
        php "$@"

@@ -59,29 +59,51 @@ devbox_panic() {
 # This will print an error and exit with status code 1 if $PWD isn't
 # in $devbox_projects_dir.
 devbox_pwd_in_container() {
-  if [[ ! "$PWD" =~ ^"$devbox_projects_dir" ]]; then
+  local real_projects_dir="$(_path_windows_to_unix "$devbox_projects_dir")"
+
+  if [[ ! "$PWD" =~ ^"$real_projects_dir" ]]; then
       devbox_panic "you are not in $devbox_projects_dir"
   fi
 
-  echo "/projects/${PWD/#$devbox_projects_dir\/}"
+  printf %s "/projects/${PWD/#$real_projects_dir\/}"
 }
 
 # -- Internal functions --------------------------------------------------------
+
+# Translate Windows-style paths into Msys format.
+#
+# E.g., C:\Public\Foobar → /c/Public/Foobar
+#
+# Paths are returned unchanged if they don't start with "C:\".
+_path_windows_to_unix() {
+  if [[ "$1" =~ ^C:\\ ]]; then
+      local result="$1"
+
+      result="${1/#C:/\/c}"      # replace "C:" with "/c"
+      result="${result//\\/\/}"  # replace all "\" with "/"
+
+      set -- "$result"
+  fi
+
+  printf %s "$1"
+}
 
 # Translate Msys-style file system paths to Windows paths.
 #
 # E.g., /c/Public/Foobar → C:\Public\Foobar
 #
-# Paths are returned unchanged if this script isn't running under Git
-# bash, or if they don't start with /c/.
-_windows_path_hack() {
-  if [[ "$devbox_os" == Msys && "$1" =~ ^"/c/" ]]; then
-      local path_with_prefix="${1/#\/c/C:}"
-      local path_with_prefix_and_backslashes="${path_with_prefix//\//\\/}"
-      set -- "$path_with_prefix_and_backslashes"
+# Paths are returned unchanged if they don't start with /c/.
+_path_unix_to_windows() {
+  if [[ "$1" =~ ^/c/ ]]; then
+      local result="$1"
+
+      result="${1/#\/c/C:}"                 # replace "/c" with "C:"
+      result="${path_with_prefix//\//\\/}"  # replace all "/" with "\"
+
+      set -- "$result"
   fi
 
-  echo "$1"
+  printf %s "$1"
 }
 
 # (satellite function for _main)
@@ -116,7 +138,7 @@ _main() {
 
   # Non-configurable directories
   devbox_repo_dir="$(realpath "$_script_dir"/..)"
-  devbox_shell_dir="$(_windows_path_hack "$devbox_repo_dir"/shell)"
+  devbox_shell_dir="$(_path_unix_to_windows "$devbox_repo_dir"/shell)"
 
   _main_load_dot_env
 

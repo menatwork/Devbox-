@@ -92,8 +92,8 @@ _path_unix_to_windows() {
   if [[ "$1" =~ ^/c/ ]]; then
       local result="$1"
 
-      result="${1/#\/c/C:}"                 # replace "/c" with "C:"
-      result="${path_with_prefix//\//\\/}"  # replace all "/" with "\"
+      result="${result/#\/c/C:}"  # replace "/c" with "C:"
+      result="${result//\//\\/}"  # replace all "/" with "\"
 
       set -- "$result"
   fi

@@ -20,7 +20,7 @@ werden kann.
 
 1. `sudo apt install docker.io`
 2. `sudo gpasswd -a $(whoami) docker`
-3. Neu anmelden um die Änderung der Benutzergruppen zu übernehmen
+3. Neu anmelden, um die Änderung der Benutzergruppen zu übernehmen
 4. → Allgemeine Schritte
 
 ### Allgemeine Schritte
@@ -28,7 +28,7 @@ werden kann.
 ```
 $ git clone https://gitlab.men-at-work.de/entwicklung/devbox.git
 $ cd devbox
-$ devbox setup
+$ bin/devbox setup
 ```
 
 [1]: https://www.docker.com/

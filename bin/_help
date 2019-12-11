@@ -12,6 +12,7 @@ echo -e "
     help     -- Diesen Hilfetext anzeigen
 
   \e[1mWartung\e[0m
+    update   -- devbox-Image und Repository updaten
     build    -- ein neues devbox-Image bauen
     push     -- gebautes devbox-Image ins GitLab-Registry pushen
 "

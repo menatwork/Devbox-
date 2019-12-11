@@ -16,6 +16,8 @@ packages=(
   php5.6-imagick php5.6-mbstring php5.6-zip php5.6-mysql php5.6-soap
   php5.6-mcrypt
 
+  nodejs yarn
+
   # runtime requirement for mod_vhost_devbox
   libyaml-0-2
 
@@ -38,9 +40,17 @@ packages_build_deps=(
 export DEBIAN_FRONTEND=noninteractive
 
 apt-get update -qq
-apt-get install -qq --no-install-recommends software-properties-common
+apt-get install -qq --no-install-recommends \
+	software-properties-common apt-transport-https gnupg
+
+# Add third-party software sources
+# (keys are in docker/files.apt-pre/etc/apt/trusted.gpg.d)
+echo 'deb https://deb.nodesource.com/node_12.x bionic main' > /etc/apt/sources.list.d/nodesource.list
+echo 'deb https://dl.yarnpkg.com/debian/ stable main' > /etc/apt/sources.list.d/yarn.list
+
 apt-add-repository --yes ppa:ondrej/php
 
+# Install software
 apt-get install -qq --no-install-recommends \
 	"${packages[@]}" "${packages_build_deps[@]}"
 
@@ -51,4 +61,4 @@ make -C /tmp/mod_vhost_devbox install
 # Remove build deps and package lists
 apt-get purge -qq "${packages_build_deps[@]}"
 apt-get autoremove -qq --purge
-rm -rf /var/lib/apt/lists/*
+rm -rf /var/lib/apt/lists/* /tmp/mod_vhost_devbox

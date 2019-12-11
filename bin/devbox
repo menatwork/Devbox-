@@ -33,18 +33,18 @@ devbox_docker() {
 # Print an info message.
 devbox_info() {
   if [[ -v _scriptname ]]; then
-    printf "\e[1mdevbox %s:\e[0m %s\n" "$_scriptname" "$@"
+    printf "\e[1;96m==> devbox %s:\e[0;96m %s\e[0m\n" "$_scriptname" "$@"
   else
-    printf "\e[1mdevbox:\e[0m %s\n" "$@"
+    printf "\e[1;96m==> devbox:\e[0;96m %s\e[0m\n" "$@"
   fi
 }
 
 # Print an error message.
 devbox_error() {
   if [[ -v _scriptname ]]; then
-    >&2 printf "\e[1;31mdevbox %s:\e[0;31m %s\e[0m\n" "$_scriptname" "$@"
+    >&2 printf "\e[1;31m==> devbox %s:\e[0;31m %s\e[0m\n" "$_scriptname" "$@"
   else
-    >&2 printf "\e[1;31mdevbox:\e[0;31m %s\e[0m\n" "$@"
+    >&2 printf "\e[1;31m==> devbox:\e[0;31m %s\e[0m\n" "$@"
   fi
 }
 

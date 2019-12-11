@@ -1,5 +1,5 @@
 #!/bin/bash
-echo
+
 devbox_info "Updating devbox repository at $devbox_repo_dir..."
 git -C "$devbox_repo_dir" pull
 
@@ -8,6 +8,6 @@ devbox_info "Pulling latest devbox image..."
 devbox_docker image pull "$devbox_image"
 
 echo
-devbox_info "devbox was updated!"
+devbox_info "completed!"
 
 

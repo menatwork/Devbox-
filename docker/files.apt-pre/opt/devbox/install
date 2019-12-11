@@ -6,7 +6,7 @@ set -eu
 
 # This set of packages will be installed and kept in the image.
 packages=(
-  supervisor apache2 mariadb-server composer openssh-client
+  supervisor apache2 mariadb-server composer openssh-client git
 
   php7.3-fpm php7.3-xml php7.3-curl php7.3-intl php7.3-gd
   php7.3-imagick php7.3-mbstring php7.3-zip php7.3-mysql php7.3-soap

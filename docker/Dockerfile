@@ -1,7 +1,10 @@
 FROM ubuntu:bionic
 
 ARG DEVBOX_UID
-RUN if [ -n "DEVBOX_UID" ]; then usermod -u $DEVBOX_UID www-data; fi
+ARG DEVBOX_GID
+
+RUN usermod -u "$DEVBOX_UID" www-data
+RUN groupmod -g "$DEVBOX_GID" www-data
 
 COPY files.apt-pre/ /
 COPY mod_vhost_devbox /tmp/mod_vhost_devbox

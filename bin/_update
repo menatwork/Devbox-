@@ -7,7 +7,12 @@ echo
 devbox_info "Pulling latest devbox image..."
 devbox_docker image pull "$devbox_image"
 
+if devbox_is_running; then
+  devbox_info "Restarting container '$devbox_container'..."
+  docker restart "$devbox_container"
+else
+  devbox_info "Container '$devbox_container' seems to be down, not restarting"
+fi
+
 echo
 devbox_info "completed!"
-
-

@@ -2,10 +2,10 @@
 set -e
 
 # mysqld's unix socket goes in this directory
-install -m 755 -o mysql -g root -d /var/run/mysqld
+install -m 755 -o mysql -g root -d /run/mysqld
 
 # make sure the mysql user owns the db data because changes to the
 # image build can cause UIDs to change
 chown -R mysql:root /var/lib/mysql
 
-exec /usr/sbin/mysqld --user=mysql --init-file=/opt/devbox/mariadb_init.sql
+exec /usr/sbin/mysqld --user=mysql --init-file=/mariadb_init.sql

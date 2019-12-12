@@ -4,10 +4,16 @@
 #
 set -eu
 
-# This set of packages will be installed and kept in the image.
 packages=(
-  supervisor apache2 mariadb-server composer openssh-client git
+  runit apache2 mariadb-server composer openssh-client git
 
+  # runtime requirement for mod_vhost_devbox
+  libyaml-0-2
+
+  # runtime requirement for mailcatcher
+  ruby
+
+  # ppa:ondrej/php
   php7.3-fpm php7.3-xml php7.3-curl php7.3-intl php7.3-gd
   php7.3-imagick php7.3-mbstring php7.3-zip php7.3-mysql php7.3-soap
   php7.3-yaml
@@ -16,13 +22,8 @@ packages=(
   php5.6-imagick php5.6-mbstring php5.6-zip php5.6-mysql php5.6-soap
   php5.6-mcrypt
 
+  # nodesource & yarn
   nodejs yarn
-
-  # runtime requirement for mod_vhost_devbox
-  libyaml-0-2
-
-  # runtime requirement for mailcatcher
-  ruby
 )
 
 # These packages will be installed, kept around for any builds that
@@ -36,7 +37,7 @@ packages_build_deps=(
   apache2-dev libyaml-dev
 )
 
-# skip all interactive package configuration
+# Skip all interactive package configuration
 export DEBIAN_FRONTEND=noninteractive
 
 apt-get update -qq
@@ -44,17 +45,20 @@ apt-get install -qq --no-install-recommends \
 	software-properties-common apt-transport-https gnupg
 
 # Add third-party software sources
-# (keys are in docker/files.apt-pre/etc/apt/trusted.gpg.d)
+# (signing keys are in docker/files.apt-pre/etc/apt/trusted.gpg.d)
 echo 'deb https://deb.nodesource.com/node_12.x bionic main' > /etc/apt/sources.list.d/nodesource.list
 echo 'deb https://dl.yarnpkg.com/debian/ stable main' > /etc/apt/sources.list.d/yarn.list
 
 apt-add-repository --yes ppa:ondrej/php
 
+# Pull in any package upgrades released since our base image was built
+apt-get upgrade --quiet=2
+
 # Install software
 apt-get install -qq --no-install-recommends \
 	"${packages[@]}" "${packages_build_deps[@]}"
 
-gem install mailcatcher
+gem install --no-document mailcatcher
 
 make -C /tmp/mod_vhost_devbox install
 

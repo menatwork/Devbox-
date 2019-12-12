@@ -1,9 +1,0 @@
-#!/bin/sh
-set -e
-
-install -m 755 -d /run/php
-
-exec /usr/sbin/php-fpm"$1"	\
-     --nodaemonize		\
-     --force-stderr		\
-     --fpm-config /etc/php/"$1"/fpm/php-fpm.conf

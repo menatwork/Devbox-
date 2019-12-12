@@ -1,0 +1,10 @@
+#!/bin/sh
+graceful_exit() {
+  for service in /etc/service/*; do
+    /sbin/sv stop "$service"
+  done
+}
+
+trap graceful_exit TERM
+/usr/bin/runsvdir /etc/service &
+wait

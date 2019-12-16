@@ -1,6 +1,6 @@
 #!/bin/sh
 install -m 755 -d /run/php
-exec /usr/sbin/php-fpm5.6	\
-     --nodaemonize		\
-     --force-stderr		\
+exec php-fpm5.6     \
+     --nodaemonize  \
+     --force-stderr \
      --fpm-config /etc/php/5.6/fpm/php-fpm.conf

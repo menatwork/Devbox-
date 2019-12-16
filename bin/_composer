@@ -1,13 +1,3 @@
 #!/bin/bash
-# ! KEEP THE DOUBLE-SLASHES !
-# They're required for Windows compatibility.
-
-workdir="$(devbox_pwd_in_container)"
-devbox_docker exec				\
-       --interactive				\
-       --tty					\
-       --workdir /"$workdir"			\
-       --user www-data				\
-       --env SSH_AUTH_SOCK=//tmp/ssh-agent.sock	\
-       "$devbox_container"			\
-       composer "$@"
+set -- composer "$@"
+. "$_script_dir"/_exec

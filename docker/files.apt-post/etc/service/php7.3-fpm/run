@@ -1,6 +1,6 @@
 #!/bin/sh
 install -m 755 -d /run/php
-exec /usr/sbin/php-fpm7.3	\
-     --nodaemonize		\
-     --force-stderr		\
+exec php-fpm7.3     \
+     --nodaemonize  \
+     --force-stderr \
      --fpm-config /etc/php/7.3/fpm/php-fpm.conf

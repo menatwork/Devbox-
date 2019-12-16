@@ -1,17 +1,18 @@
 #!/bin/bash
 # ! KEEP THE DOUBLE-SLASHES !
 # They're required for Windows compatibility.
-devbox_docker run							\
+
+devbox_docker run                                                   \
        --volume "$devbox_volume_composer"://var/www/.composer/cache	\
-       --volume "$devbox_volume_mysql"://var/lib/mysql			\
-       --volume "$devbox_volume_sessions"://var/lib/php/sessions	\
-       --volume "$devbox_ssh_dir"://var/www/.ssh			\
-       --volume "$devbox_shell_dir"://shell				\
-       --volume "$devbox_projects_dir"://projects			\
-       --publish 80:80							\
-       --publish 1080:1080						\
-       --publish 3306:3306						\
-       --publish 8081:8081						\
-       --name "$devbox_container"					\
-       --rm								\
+       --volume "$devbox_volume_mysql"://var/lib/mysql              \
+       --volume "$devbox_volume_sessions"://var/lib/php/sessions    \
+       --volume "$devbox_ssh_dir"://var/www/.ssh                    \
+       --volume "$devbox_shell_dir"://shell                         \
+       --volume "$devbox_projects_dir"://projects                   \
+       --publish 80:80                                              \
+       --publish 1080:1080                                          \
+       --publish 3306:3306                                          \
+       --publish 8081:8081                                          \
+       --name "$devbox_container"                                   \
+       --rm                                                         \
        "$devbox_image"

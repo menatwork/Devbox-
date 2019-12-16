@@ -8,4 +8,4 @@ install -m 755 -o mysql -g root -d /run/mysqld
 # image build can cause UIDs to change
 chown -R mysql:root /var/lib/mysql
 
-exec /usr/sbin/mysqld --user=mysql --init-file=/mariadb_init.sql
+exec mysqld --user=mysql --init-file=/mariadb_init.sql

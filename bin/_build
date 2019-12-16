@@ -1,6 +1,6 @@
 #!/bin/bash
-devbox_docker build			\
-     --build-arg DEVBOX_UID="$(id -u)"	\
-     --build-arg DEVBOX_GID="$(id -g)"	\
-     --tag "$devbox_image_tag"		\
+devbox_docker build                    \
+     --build-arg DEVBOX_UID="$(id -u)" \
+     --build-arg DEVBOX_GID="$(id -g)" \
+     --tag "$devbox_image_tag"         \
      "$devbox_repo_dir"/docker

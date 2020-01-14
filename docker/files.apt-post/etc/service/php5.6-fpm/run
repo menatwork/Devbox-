@@ -1,5 +1,4 @@
 #!/bin/sh
-install -m 755 -d /run/php
 exec php-fpm5.6     \
      --nodaemonize  \
      --force-stderr \

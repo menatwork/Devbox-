@@ -1,3 +1,2 @@
 #!/bin/sh
-install -m 750 -o www-data -g www-data -d /run/ssh-agent
 exec chpst -u www-data ssh-agent -a /run/ssh-agent/.sock -D

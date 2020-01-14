@@ -154,9 +154,9 @@ _main() {
   devbox_image_tag="$devbox_image":latest
 
   # Names of Docker volumes for persistent data
-  devbox_volume_composer=devbox-composer
   devbox_volume_mysql=devbox-mysql
   devbox_volume_sessions=devbox-sessions
+  devbox_volume_cache=devbox-cache
 
   if [[ "$_scriptname" != setup ]]; then
       # Configurable directories

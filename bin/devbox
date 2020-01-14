@@ -39,6 +39,16 @@ devbox_info() {
   fi
 }
 
+# Ask the user a y/n question with no default selection.
+devbox_prompt() {
+  printf "\e[1;33m==> devbox: %s [y/n] \e[0m" "$@"
+
+  local response
+  read -r response
+
+  [[ "$response" =~ ^[yY]$ ]]
+}
+
 # Print an error message.
 devbox_error() {
   if [[ -v _scriptname ]]; then

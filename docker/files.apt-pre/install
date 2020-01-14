@@ -1,17 +1,21 @@
 #!/bin/bash
 #
-# /opt/devbox/install -- setup script for the devbox image
+# install -- setup script for the devbox image
 #
 set -eu
 
+# Skip all interactive package configuration
+export DEBIAN_FRONTEND=noninteractive
+
 packages=(
-  runit apache2 mariadb-server composer openssh-client git
-
-  # runtime requirement for mod_vhost_devbox
-  libyaml-0-2
-
-  # runtime requirement for mailcatcher
-  ruby
+  runit
+  apache2
+  mariadb-server
+  composer
+  openssh-client
+  git
+  libyaml-0-2  # required for mod_vhost_devbox
+  ruby  # required for mailcatcher
 
   # ppa:ondrej/php
   php7.3-fpm php7.3-xml php7.3-curl php7.3-intl php7.3-gd
@@ -26,10 +30,8 @@ packages=(
   nodejs yarn
 )
 
-# These packages will be installed, kept around for any builds that
-# require them and then removed to keep the image as small as
-# possible.
-packages_build_deps=(
+# These packages can be removed before the image is finalized
+packages_temporary=(
   # build requirements for mailcatcher
   build-essential ruby-dev libsqlite3-dev
 
@@ -37,32 +39,35 @@ packages_build_deps=(
   apache2-dev libyaml-dev
 )
 
-# Skip all interactive package configuration
-export DEBIAN_FRONTEND=noninteractive
+# -- Add third-party software sources -------------------------------------------
+# (signing keys are in docker/files.apt-pre/etc/apt/trusted.gpg.d)
 
-apt-get update -qq
-apt-get install -qq --no-install-recommends \
+apt-get update --quiet=2
+apt-get install --quiet=2 --no-install-recommends \
 	software-properties-common apt-transport-https gnupg
 
-# Add third-party software sources
-# (signing keys are in docker/files.apt-pre/etc/apt/trusted.gpg.d)
-echo 'deb https://deb.nodesource.com/node_12.x bionic main' > /etc/apt/sources.list.d/nodesource.list
-echo 'deb https://dl.yarnpkg.com/debian/ stable main' > /etc/apt/sources.list.d/yarn.list
+echo 'deb https://deb.nodesource.com/node_12.x bionic main' \
+     > /etc/apt/sources.list.d/nodesource.list
 
+echo 'deb https://dl.yarnpkg.com/debian/ stable main' \
+     > /etc/apt/sources.list.d/yarn.list
+
+# This updates the package lists, no additional apt update is needed
 apt-add-repository --yes ppa:ondrej/php
 
-# Pull in any package upgrades released since our base image was built
-apt-get upgrade --quiet=2
+# -- Install upgrades and packages ----------------------------------------------
 
-# Install software
-apt-get install -qq --no-install-recommends \
-	"${packages[@]}" "${packages_build_deps[@]}"
+apt-get upgrade --quiet=2
+apt-get install --quiet=2 --no-install-recommends \
+	"${packages[@]}" "${packages_temporary[@]}"
 
 gem install --no-document mailcatcher
 
 make -C /tmp/mod_vhost_devbox install
 
-# Remove build deps and package lists
-apt-get purge -qq "${packages_build_deps[@]}"
-apt-get autoremove -qq --purge
+# -- Cleanup --------------------------------------------------------------------
+
+apt-get purge --quiet=2 "${packages_temporary[@]}"
+apt-get autoremove --quiet=2 --purge
+
 rm -rf /var/lib/apt/lists/* /tmp/mod_vhost_devbox

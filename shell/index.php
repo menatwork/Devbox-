@@ -4,6 +4,7 @@ $start = microtime(true);
 ?>
 <!DOCTYPE html>
 <link rel="stylesheet" href="style.css">
+<link rel="icon" type="image/png" href="/img/favicon.png" sizes="32x32">
 <title>devbox.localhost</title>
 
 <header class="page-header">

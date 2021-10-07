@@ -6,6 +6,8 @@ Arbeit an PHP-Projekten notwendig ist: Apache, PHP, ein MariaDB-Server
 und ein Tool namens [Mailcatcher][2], mit dem Mailversand getestet
 werden kann.
 
+Das Changelog ist [hier](CHANGELOG.md) zu finden.
+
 ## Installation
 
 ### Windows

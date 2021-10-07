@@ -11,24 +11,28 @@ packages=(
   runit
   apache2
   mariadb-server
-  composer
   openssh-client
   git
   libyaml-0-2  # required for mod_vhost_devbox
   ruby  # required for mailcatcher
+  curl
+  htop
 
   # ppa:ondrej/php
-  php7.3-fpm php7.3-xml php7.3-curl php7.3-intl php7.3-gd
-  php7.3-imagick php7.3-mbstring php7.3-zip php7.3-mysql php7.3-soap
-  php7.3-yaml
+  php7.4-fpm php7.4-xml php7.4-curl php7.4-intl php7.4-gd
+  php7.4-imagick php7.4-mbstring php7.4-zip php7.4-mysql php7.4-soap
+  php7.4-yaml
 
   php5.6-fpm php5.6-xml php5.6-curl php5.6-intl php5.6-gd
   php5.6-imagick php5.6-mbstring php5.6-zip php5.6-mysql php5.6-soap
   php5.6-mcrypt
 
-  # nodesource & yarn
-  nodejs yarn
+  # nodesource
+  nodejs
 )
+
+composer_1_version=1.10.22
+composer_2_version=2.1.8
 
 # These packages can be removed before the image is finalized
 packages_temporary=(
@@ -42,32 +46,51 @@ packages_temporary=(
 # -- Add third-party software sources -------------------------------------------
 # (signing keys are in docker/files.apt-pre/etc/apt/trusted.gpg.d)
 
-apt-get update --quiet=2
-apt-get install --quiet=2 --no-install-recommends \
-	software-properties-common apt-transport-https gnupg
+echo "fetching package lists..."
+apt-get update --quiet=2 > /dev/null
 
-echo 'deb https://deb.nodesource.com/node_12.x bionic main' \
+echo "installing PPA requirements..."
+apt-get install --quiet=2 --no-install-recommends \
+	software-properties-common gnupg \
+  > /dev/null
+
+echo "adding nodesource repo..."
+echo 'deb https://deb.nodesource.com/node_14.x focal main' \
      > /etc/apt/sources.list.d/nodesource.list
 
-echo 'deb https://dl.yarnpkg.com/debian/ stable main' \
-     > /etc/apt/sources.list.d/yarn.list
-
 # This updates the package lists, no additional apt update is needed
-apt-add-repository --yes ppa:ondrej/php
+echo "adding ppa:ondrej/php..."
+apt-add-repository --yes ppa:ondrej/php > /dev/null
 
 # -- Install upgrades and packages ----------------------------------------------
 
-apt-get upgrade --quiet=2
+echo "upgrading base system and installing packages..."
+apt-get upgrade --quiet=2 > /dev/null
 apt-get install --quiet=2 --no-install-recommends \
-	"${packages[@]}" "${packages_temporary[@]}"
+	"${packages[@]}" "${packages_temporary[@]}" \
+  > /dev/null
 
-gem install --no-document mailcatcher
+echo "installing composer..."
+curl --location --output /usr/local/bin/composer1 \
+    https://getcomposer.org/download/"$composer_1_version"/composer.phar
 
-make -C /tmp/mod_vhost_devbox install
+curl --location --output /usr/local/bin/composer \
+    https://getcomposer.org/download/"$composer_2_version"/composer.phar
+
+chmod +x /usr/local/bin/composer1 /usr/local/bin/composer
+
+echo "installing yarn..."
+npm install -g yarn > /dev/null
+
+echo "installing mailcatcher..."
+gem install --no-document mailcatcher > /dev/null
+
+echo "building mod_vhost_devbox..."
+make -C /tmp/mod_vhost_devbox install > /dev/null
 
 # -- Cleanup --------------------------------------------------------------------
 
-apt-get purge --quiet=2 "${packages_temporary[@]}"
-apt-get autoremove --quiet=2 --purge
+echo "minimizing image size..."
 
+apt-get autoremove --quiet=2 --purge "${packages_temporary[@]}" > /dev/null
 rm -rf /var/lib/apt/lists/* /tmp/mod_vhost_devbox

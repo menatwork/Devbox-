@@ -1,4 +1,4 @@
-FROM ubuntu:bionic
+FROM ubuntu:focal
 
 ARG DEVBOX_UID
 ARG DEVBOX_GID
@@ -15,6 +15,6 @@ COPY files.apt-post/ /
 
 RUN true \
 	&& a2enmod  --quiet proxy_fcgi setenvif rewrite headers vhost_devbox \
-	&& a2enconf --quiet php7.3-fpm devbox
+	&& a2enconf --quiet php7.4-fpm devbox
 
 ENTRYPOINT ["/init"]

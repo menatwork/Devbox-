@@ -22,6 +22,12 @@ stop_all() {
   done
 }
 
+cat <<EOF
+┌─────────────────────────────────┐
+│ Zis is ze devbox. It boxes dev. │
+└─────────────────────────────────┘
+EOF
+
 trap stop_all TERM
 
 runsvdir /etc/service &

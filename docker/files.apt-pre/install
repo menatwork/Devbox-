@@ -16,6 +16,7 @@ packages=(
   ruby  # required for mailcatcher
   curl
   htop
+  unzip  # composer likes to have this around
 
   # required for devbox-autoconfig
   python3-pip
@@ -41,6 +42,9 @@ composer_2_version=2.1.8
 packages_temporary=(
   # build requirements for mailcatcher
   build-essential ruby-dev libsqlite3-dev
+
+  # pimpmymlog setup
+  sudo
 )
 
 # -- Add third-party software sources -------------------------------------------
@@ -88,9 +92,18 @@ npm install -g yarn > /dev/null
 echo "installing mailcatcher..."
 gem install --no-document mailcatcher > /dev/null
 
+echo "installing pimp my log..."
+mkdir /var/www/pimpmylog
+(
+  cd /var/www/pimpmylog
+  chown www-data: -R /var/www/pimpmylog
+  sudo -u www-data composer require --quiet potsky/pimp-my-log
+)
+
 # -- Cleanup --------------------------------------------------------------------
 
 echo "minimizing image size..."
 
-apt-get autoremove --quiet=2 --purge "${packages_temporary[@]}" > /dev/null
-rm -rf /var/lib/apt/lists/* /tmp/mod_vhost_devbox
+export SUDO_FORCE_REMOVE=yes
+apt-get autoremove --quiet=2 --purge "${packages_temporary[@]}"
+rm -rf /var/lib/apt/lists/*

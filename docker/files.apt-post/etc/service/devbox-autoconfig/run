@@ -1,0 +1,2 @@
+#!/bin/sh
+exec /usr/local/sbin/devbox-autoconfig.py /etc/devbox-autoconfig.ini

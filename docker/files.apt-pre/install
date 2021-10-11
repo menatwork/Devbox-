@@ -13,10 +13,13 @@ packages=(
   mariadb-server
   openssh-client
   git
-  libyaml-0-2  # required for mod_vhost_devbox
   ruby  # required for mailcatcher
   curl
   htop
+
+  # required for devbox-autoconfig
+  python3-pip
+  python3-yaml
 
   # ppa:ondrej/php
   php7.4-fpm php7.4-xml php7.4-curl php7.4-intl php7.4-gd
@@ -38,9 +41,6 @@ composer_2_version=2.1.8
 packages_temporary=(
   # build requirements for mailcatcher
   build-essential ruby-dev libsqlite3-dev
-
-  # build requirements for mod_vhost_devbox
-  apache2-dev libyaml-dev
 )
 
 # -- Add third-party software sources -------------------------------------------
@@ -70,6 +70,9 @@ apt-get install --quiet=2 --no-install-recommends \
 	"${packages[@]}" "${packages_temporary[@]}" \
   > /dev/null
 
+echo "installing devbox-autoconfig dependencies..."
+pip3 install --quiet inotify cerberus
+
 echo "installing composer..."
 curl --location --output /usr/local/bin/composer1 \
     https://getcomposer.org/download/"$composer_1_version"/composer.phar
@@ -84,9 +87,6 @@ npm install -g yarn > /dev/null
 
 echo "installing mailcatcher..."
 gem install --no-document mailcatcher > /dev/null
-
-echo "building mod_vhost_devbox..."
-make -C /tmp/mod_vhost_devbox install > /dev/null
 
 # -- Cleanup --------------------------------------------------------------------
 

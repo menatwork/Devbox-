@@ -16,19 +16,11 @@ install -m 755 -d /run/php
 chown -R mysql:root /var/lib/mysql
 chown -R www-data:  /var/www/.cache
 
-stop_all() {
-  for service in /etc/service/*; do
-    sv stop "$service"
-  done
-}
-
 cat <<EOF
 ┌─────────────────────────────────┐
 │ Zis is ze devbox. It boxes dev. │
 └─────────────────────────────────┘
 EOF
-
-trap stop_all TERM
 
 runsvdir /etc/service &
 wait

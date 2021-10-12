@@ -13,7 +13,8 @@ RUN /install
 COPY files.apt-post/ /
 
 RUN true \
-	&& a2enmod  --quiet proxy_fcgi setenvif rewrite headers \
-	&& a2enconf --quiet devbox
+	&& a2enmod  --quiet proxy_fcgi proxy_http proxy_wstunnel setenvif rewrite headers \
+	&& a2enconf --quiet devbox \
+  && a2dissite --quiet 000-default
 
 ENTRYPOINT ["/init"]

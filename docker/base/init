@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 set -eu
 
 # Set up state directories used by various tools
@@ -8,12 +8,10 @@ install -m 750 -d /var/www/.yarn  -o www-data -g www-data
 # Set up ephemeral directories needed by our services
 install -m 755 -d /run/apache2/devbox-vhosts -o www-data -g www-data
 install -m 750 -d /run/ssh-agent             -o www-data -g www-data
-install -m 755 -d /run/mysqld                -o mysql    -g root
 install -m 755 -d /run/php
 
 # Ensure volume permissions are correct as changes to the build
 # process may result in UIDs changing
-chown -R mysql:root /var/lib/mysql
 chown -R www-data:  /var/www/.cache
 
 cat <<EOF
@@ -22,5 +20,12 @@ cat <<EOF
 └─────────────────────────────────┘
 EOF
 
+trap "on_exit" EXIT
+
+on_exit() {
+  kill -HUP $pid
+}
+
 runsvdir /etc/service &
+pid=$!
 wait

@@ -1,4 +1,7 @@
 #!/bin/bash
+install -m 755 -d /run/mysqld -o mysql -g root
+chown -R mysql:root /var/lib/mysql
+
 mysqld \
   --user=mysql \
   --init-file=/mariadb_init.sql \

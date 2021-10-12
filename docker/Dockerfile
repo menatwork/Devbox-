@@ -6,15 +6,30 @@ ARG DEVBOX_GID
 RUN usermod -u "$DEVBOX_UID" www-data
 RUN groupmod -g "$DEVBOX_GID" www-data
 
-COPY files.apt-pre/ /
+COPY base /
 
-RUN /install
+RUN build-helper update \
+  && build-helper upgrade \
+  && build-helper install runit git openssh-client
 
-COPY files.apt-post/ /
+COPY apache2 /
+RUN build-helper run /install-apache2.sh
 
-RUN true \
-	&& a2enmod  --quiet proxy_fcgi proxy_http proxy_wstunnel setenvif rewrite headers \
-	&& a2enconf --quiet devbox \
-  && a2dissite --quiet 000-default
+COPY mariadb /
+RUN build-helper run /install-mariadb.sh
 
-ENTRYPOINT ["/init"]
+COPY php /
+RUN build-helper run /install-php.sh
+
+COPY mailcatcher /
+RUN build-helper run /install-mailcatcher.sh
+
+COPY nodejs /
+RUN build-helper run /install-nodejs.sh
+
+COPY devbox-autoconf /
+RUN build-helper run /install-devbox-autoconf.sh
+
+RUN build-helper shrink
+
+ENTRYPOINT [ "/init" ]

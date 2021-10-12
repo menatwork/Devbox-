@@ -1,0 +1,4 @@
+#!/bin/bash
+devbox-autoconf.py /etc/devbox-autoconf.ini \
+  2> >(log-prefix \! autoconf) \
+  1> >(log-prefix . autoconf)

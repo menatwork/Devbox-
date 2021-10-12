@@ -9,6 +9,7 @@ devbox_docker run                                                   \
        --volume "$devbox_ssh_dir"://var/www/.ssh                    \
        --volume "$devbox_shell_dir"://shell                         \
        --volume "$devbox_projects_dir"://projects                   \
+       --volume "$devbox_volume_logs"://var/log                     \
        --publish 80:80                                              \
        --publish 1080:1080                                          \
        --publish 3306:3306                                          \

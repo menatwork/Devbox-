@@ -167,6 +167,7 @@ _main() {
   devbox_volume_mysql=devbox-mysql
   devbox_volume_sessions=devbox-sessions
   devbox_volume_cache=devbox-cache
+  devbox_volume_logs=devbox-logs
 
   if [[ "$_scriptname" != setup ]]; then
       # Configurable directories

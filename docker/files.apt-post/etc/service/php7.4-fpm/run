@@ -1,5 +1,6 @@
-#!/bin/sh
-exec php-fpm7.4     \
-     --nodaemonize  \
-     --force-stderr \
-     --fpm-config /etc/php/7.4/fpm/php-fpm.conf
+#!/bin/bash
+php-fpm7.4 \
+  --nodaemonize \
+  --fpm-config /etc/php/7.4/fpm/php-fpm.conf \
+  2> >(log-prefix \! php-fpm7.4) \
+  1> >(log-prefix . php-fpm7.4)

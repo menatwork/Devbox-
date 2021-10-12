@@ -1,2 +1,7 @@
-#!/bin/sh
-exec mysqld --user=mysql --init-file=/mariadb_init.sql
+#!/bin/bash
+mysqld \
+  --user=mysql \
+  --init-file=/mariadb_init.sql \
+  --silent-startup \
+  2> >(log-prefix \! mariadb) \
+  1> >(log-prefix . mariadb)

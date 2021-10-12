@@ -1,2 +1,4 @@
-#!/bin/sh
-exec chpst -u www-data ssh-agent -a /run/ssh-agent/.sock -D
+#!/bin/bash
+chpst -u www-data ssh-agent -a /run/ssh-agent/.sock -D \
+  2> >(log-prefix \! ssh-agent) \
+  1> /dev/null

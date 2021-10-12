@@ -1,2 +1,6 @@
-#!/bin/sh
-exec mailcatcher --foreground --http-ip 0.0.0.0
+#!/bin/bash
+mailcatcher \
+  --foreground \
+  --http-ip 0.0.0.0 \
+  --no-quit \
+  &> /var/log/mailcatcher.log

@@ -1,6 +1,8 @@
 import logging
 import os
 
+import jinja2
+
 from .config import Config
 from .schema import Schema, SchemaError
 from .watcher import SchemaFileWatcher
@@ -50,11 +52,22 @@ class Autoconf(object):
                 logging.warn(f"ignoring unknown watcher event: {event}")
 
     def vhost_update(self, schema: Schema):
-        vhost_file = schema.vhost_file_path(self.cfg.apache2_vhost_directory)
-        apache2_config = schema.to_apache2_vhost_config(self.cfg.php_versions)
+        try:
+            apache2_config = self.render_apache2_vhost_config(schema)
+        except IOError as e:
+            logging.error(f"vhost update failed, couldn't read template: {e}")
+            return
+        except jinja2.TemplateError as e:
+            logging.error(f"vhost update failed, invalid template: {e}")
+            return
 
-        with open(vhost_file, 'w') as f:
-            f.write(apache2_config)
+        try:
+            vhost_file = schema.vhost_file_path(self.cfg.apache2_vhost_directory)
+            with open(vhost_file, 'w') as f:
+                f.write(apache2_config)
+        except IOError as e:
+            logging.error(f"vhost update failed, couldn't write config: {vhost_file}: {e}")
+            return
 
         self.reload_apache2()
 
@@ -69,3 +82,19 @@ class Autoconf(object):
         r = os.system(cmd)
         if r != 0:
             logging.error(f"command returned {r}: {cmd}")
+
+    def render_apache2_vhost_config(self, schema: Schema) -> str:
+        try:
+            php_socket = self.cfg.php_versions[schema.project_php_version]
+        except KeyError:
+            raise SchemaError(f"PHP version unavailable: {schema.project_php_version}")
+
+        vhost_template = self.cfg.apache2_vhost_template
+        with open(vhost_template) as f:
+            template = jinja2.Template(f.read())
+
+        return template.render(
+            name=schema.name,
+            document_root=os.path.join(schema.project_dir, schema.project_webroot),
+            php_socket=php_socket,
+        )

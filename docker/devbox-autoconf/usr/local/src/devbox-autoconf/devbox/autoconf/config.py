@@ -12,7 +12,7 @@ class Config(object):
         self.schema_file = general['schema_file']
 
         apache2 = parser['apache2']
-        self.apache2_template = apache2['template']
+        self.apache2_vhost_template = apache2['vhost_template']
         self.apache2_vhost_directory = apache2['vhost_directory']
         self.apache2_reload_command = apache2['reload_command']
 

@@ -9,6 +9,7 @@ setup(
     install_requires=[
         'cerberus>=1.3',
         'inotify>=0.2',
+        'jinja2>=2.10'
         'pyyaml>=5.3',
     ],
     entry_points={

@@ -49,25 +49,6 @@ class Schema(object):
     def vhost_file_path(self, vhost_dir: str) -> str:
         return os.path.join(vhost_dir, f'{self.name}.conf')
 
-    def to_apache2_vhost_config(self, php_sockets: dict) -> str:
-        try:
-            php_socket = php_sockets[self.project_php_version]
-        except KeyError:
-            raise SchemaError(f"PHP version unavailable: {self.project_php_version}")
-
-        document_root = os.path.join(self.project_dir, self.project_webroot)
-
-        return f"""
-        <VirtualHost *:80>
-            ServerName "{self.name}.devbox.localhost"
-            DocumentRoot "{document_root}"
-
-            <FilesMatch "\.ph(p|ar)$">
-                SetHandler "proxy:unix:{php_socket}|fcgi://localhost"
-            </FilesMatch>
-        </VirtualHost>
-        """
-
 
 def sanitize_php_version(v):
     # handle unquoted version numbers in schema file

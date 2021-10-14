@@ -1,0 +1,22 @@
+general:
+  projects_root: /projects
+  schema_file: .devbox.yml
+
+php:
+  default_version: "7.4"
+  versions:
+    "7.4":
+      socket: /run/php/php7.4-fpm.sock
+      binary: /usr/bin/php7.4
+    "7.3":
+      socket: /run/php/php7.3-fpm.sock
+      binary: /usr/bin/php7.3
+    "5.6":
+      socket: /run/php/php5.6-fpm.sock
+      binary: /usr/bin/php5.6
+
+autoconf:
+  apache2:
+    vhost_template: apache-vhost.conf.j2
+    vhost_directory: /run/apache2/devbox-vhosts
+    reload_command: apachectl -k graceful

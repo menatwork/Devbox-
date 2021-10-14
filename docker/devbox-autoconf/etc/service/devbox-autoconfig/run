@@ -1,4 +1,0 @@
-#!/bin/bash
-devbox-autoconf /etc/devbox-autoconf/config.ini \
-  2> >(log-prefix \! autoconf) \
-  1> >(log-prefix . autoconf)

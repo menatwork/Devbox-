@@ -27,8 +27,8 @@ RUN build-helper run /install-mailcatcher.sh
 COPY nodejs /
 RUN build-helper run /install-nodejs.sh
 
-COPY devbox-autoconf /
-RUN build-helper run /install-devbox-autoconf.sh
+COPY devbox-py /
+RUN build-helper run /install-devbox-py.sh
 
 RUN build-helper shrink
 

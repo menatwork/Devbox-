@@ -1,181 +1,95 @@
-#!/bin/bash
-#
-# devbox -- core devbox CLI shell script
-#
-# This script sets up the environment and provides functions for other
-# scripts in the bin directory (_build, _run, etc), which are not
-# meant to be called directly.
-#
-# Regarding functions in this file:
-#
-# All functions prefixed with a _ are not meant to be used outside of
-# this file. Command scripts (bin/_*) should only use functions
-# prefixed with "devbox_".
-#
+#!/usr/bin/env bash
 set -euo pipefail
 
-# -- Command script functions --------------------------------------------------
+devbox_schema_file=.devbox.yml
 
-# Run a Docker command through the appropriate wrapper, if any.
-#
-# When we're running on Windows in Git bash, we need to call docker
-# through winpty to provide an interactive terminal.
-devbox_docker() {
-  case "$devbox_os" in
-    # Window/git bash
-    Msys) winpty docker "$@" ;;
+devbox_bin_dir="$(dirname "$BASH_SOURCE")"
+devbox_src_dir="$devbox_bin_dir/.."
+devbox_shell_dir="$devbox_src_dir/shell"
 
-    # Probably Linux or macOS
-    *) docker "$@" ;;
-  esac
-}
+devbox_docker_registry=gitlab.men-at-work.de:4774
+devbox_image="$devbox_docker_registry/entwicklung/devbox"
 
-# Print an info message.
-devbox_info() {
-  if [[ -v _scriptname ]]; then
-    printf "\e[1;96m==> devbox %s:\e[0;96m %s\e[0m\n" "$_scriptname" "$@"
-  else
-    printf "\e[1;96m==> devbox:\e[0;96m %s\e[0m\n" "$@"
-  fi
-}
+devbox_volume_cache=devbox-cache
+devbox_volume_mysql=devbox-mysql
+devbox_volume_sessions=devbox-sessions
+devbox_volume_logs=devbox-logs
 
-# Ask the user a y/n question with no default selection.
-devbox_prompt() {
-  printf "\e[1;33m==> devbox: %s [y/n] \e[0m" "$@"
-
-  local response
-  read -r response
-
-  [[ "$response" =~ ^[yY]$ ]]
-}
-
-# Print an error message.
-devbox_error() {
-  if [[ -v _scriptname ]]; then
-    >&2 printf "\e[1;31m==> devbox %s:\e[0;31m %s\e[0m\n" "$_scriptname" "$@"
-  else
-    >&2 printf "\e[1;31m==> devbox:\e[0;31m %s\e[0m\n" "$@"
-  fi
-}
-
-# Translate $PWD to its corresponding path in the devbox container.
-#
-# This will print an error and exit with status code 1 if $PWD isn't
-# in $devbox_projects_dir.
-devbox_pwd_in_container() {
-  local real_projects_dir="$(_path_windows_to_unix "$devbox_projects_dir")"
-
-  if [[ ! "$PWD" =~ ^"$real_projects_dir" ]]; then
-      devbox_error "you are not in $devbox_projects_dir"
-      exit 1
+main() {
+  if [[ $# < 1 ]]; then
+    echo_error "Kein Befehl angegeben"
+    . "$devbox_bin_dir/commands/help.sh"
+    exit 1
   fi
 
-  printf %s "/projects/${PWD/#$real_projects_dir\/}"
-}
-
-# Return 0 if the devbox container is running, 1 otherwise.
-devbox_is_running() {
-  docker inspect -f '{{.State.Running}}' "$devbox_container" \
-	 >/dev/null 2>/dev/null
-}
-
-# -- Internal functions --------------------------------------------------------
-
-# Translate Windows-style paths into Msys format.
-#
-# E.g., C:\Public\Foobar → /c/Public/Foobar
-#
-# Paths are returned unchanged if they don't start with "C:\".
-_path_windows_to_unix() {
-  if [[ "$1" =~ ^C:\\ ]]; then
-      local result="$1"
-
-      result="${1/#C:/\/c}"      # replace "C:" with "/c"
-      result="${result//\\/\/}"  # replace all "\" with "/"
-
-      set -- "$result"
-  fi
-
-  printf %s "$1"
-}
-
-# Translate Msys-style file system paths to Windows paths.
-#
-# E.g., /c/Public/Foobar → C:\Public\Foobar
-#
-# Paths are returned unchanged if they don't start with /c/.
-_path_unix_to_windows() {
-  if [[ "$1" =~ ^/c/ ]]; then
-      local result="$1"
-
-      result="${result/#\/c/C:}"  # replace "/c" with "C:"
-      result="${result//\//\\/}"  # replace all "/" with "\"
-
-      set -- "$result"
-  fi
-
-  printf %s "$1"
-}
-
-# (satellite function for _main)
-# Sources the repo's ".env" file if it exists.
-_main_load_dot_env() {
-  local env_file="$devbox_repo_dir"/.env
-
-  if [[ -f "$env_file" ]]; then
-    . "$env_file"
-  fi
-}
-
-# The script entry point. This sets up shell variables and defers
-# execution to the appropriate command script.
-_main() {
-  _script_dir="$(dirname "$0")"
-
-  if [[ $# -lt 1 ]]; then
-      devbox_error "missing command"
-      . "$_script_dir"/_help
-      exit 1
-  fi
-
-  _scriptname="$1"
-  _script="$_script_dir/_$1"
-
-  if [[ ! -f "$_script" ]]; then
-      devbox_error "command not found"
-      . "$_script_dir"/_help
-      exit 1
-  fi
-
+  local command="$1"
   shift
 
-  devbox_os="$(uname -o)"
+  local command_script="$devbox_bin_dir/commands/$command.sh"
 
-  # Non-configurable directories
-  devbox_repo_dir="$(realpath "$_script_dir"/..)"
-  devbox_shell_dir="$(_path_unix_to_windows "$devbox_repo_dir"/shell)"
-
-  _main_load_dot_env
-
-  devbox_docker_registry=gitlab.men-at-work.de:4774
-
-  devbox_container=devbox
-  devbox_image="$devbox_docker_registry"/entwicklung/devbox
-  devbox_image_tag="$devbox_image":latest
-
-  # Names of Docker volumes for persistent data
-  devbox_volume_mysql=devbox-mysql
-  devbox_volume_sessions=devbox-sessions
-  devbox_volume_cache=devbox-cache
-  devbox_volume_logs=devbox-logs
-
-  if [[ "$_scriptname" != setup ]]; then
-      # Configurable directories
-      devbox_projects_dir="${devbox_projects_dir:-$(realpath "$script_dir"/../..)}"
-      devbox_ssh_dir="$devbox_ssh_dir"
+  if [[ ! -f "$command_script" ]]; then
+    echo_error "Unbekannter Befehl: $command"
+    exit 1
   fi
 
-  . "$_script"
+  . "$command_script"
 }
 
-_main "$@"
+if [[ "$(uname)" == Msys ]]; then
+  # docker on windows requires winpty for an interactive tty
+  devbox_docker() {
+    winpty docker "$@"
+  }
+else
+  devbox_docker() {
+    docker "$@"
+  }
+fi
+
+echo_error() { >&2 echo_message $'\e[31m' error "$*"; }
+echo_warning() { >&2 echo_message $'\e[33m' warning "$*"; }
+echo_info() { echo_message $'\e[34m' info "$*"; }
+
+echo_debug() {
+  if is_debug; then
+    echo_message $'\e[36m' debug "$*"
+  fi
+}
+
+echo_message() {
+  local color="$1" level="$2" message="$3"
+  local color_reset=$'\e[0m'
+
+  # see http://no-color.org/
+  if [[ -v NO_COLOR ]]; then
+    color=
+    color_reset=
+  fi
+
+  printf '%s[devbox] %s: %s%s\n' "$color" "$level" "$message" "$color_reset"
+}
+
+is_debug() {
+  [[ -v DEVBOX_CLI_DEBUG && "$DEVBOX_CLI_DEBUG" == 1 ]]
+}
+
+load_dotenv_or_die() {
+  if [[ -f "$devbox_src_dir/.env" ]]; then
+    . "$devbox_src_dir/.env"
+  fi
+
+  local all_present=1
+
+  for var_name; do
+    if [[ ! -v "$var_name" || -z "${!var_name}" ]]; then
+      echo_error "Notwendige Variable $var_name fehlend oder leer"
+      all_present=0
+    fi
+  done
+
+  if [[ "$all_present" != 1 ]]; then
+    exit 1
+  fi
+}
+
+main "$@"

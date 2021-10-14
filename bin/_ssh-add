@@ -1,3 +1,0 @@
-#!/bin/bash
-set -- ssh-add "$@"
-. "$_script_dir/_exec"

@@ -1,0 +1,4 @@
+#!/bin/bash
+devbox-autoconf \
+  2> >(log-prefix \! autoconf) \
+  1> >(log-prefix . autoconf)

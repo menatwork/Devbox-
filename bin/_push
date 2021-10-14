@@ -1,2 +1,0 @@
-#!/bin/bash
-devbox_docker image push "$devbox_image_tag"

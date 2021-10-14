@@ -29,6 +29,7 @@ main() {
 
   if [[ ! -f "$command_script" ]]; then
     echo_error "Unbekannter Befehl: $command"
+    . "$devbox_bin_dir/commands/help.sh"
     exit 1
   fi
 

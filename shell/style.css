@@ -5,7 +5,7 @@
   --color-border     : #000;
 
   --font-size-big    : 18pt;
-  --font-size-normal : 11pt;
+  --font-size-normal : 10pt;
 }
 
 body {
@@ -40,7 +40,7 @@ a {
 
 .page-main {
   flex-grow: 1;
-  padding: .5em .8em;
+  padding: 1em;
 }
 
 .page-title {
@@ -77,7 +77,7 @@ a {
 
 .vhosts td, .vhosts th {
   text-align: left;
-  padding: .3em 1em;
+  padding: .5em 1em;
 }
 
 .project-icon {

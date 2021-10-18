@@ -1,48 +1,32 @@
 <?php
 require_once "devbox.php";
+
 $start = microtime(true);
+$page = 'pages/projects.php';
+
+if (isset($_GET['page'])) {
+  $page = 'pages/' . $_GET['page'] . '.php';
+}
+
+if (!file_exists($page)) {
+  $page = 'pages/not-found.php';
+}
+
+ob_start();
+require_once $page;
+$page_body = ob_get_clean();
 ?>
 <!DOCTYPE html>
-<link rel="stylesheet" href="style.css">
-<link rel="icon" type="image/png" href="/img/favicon.png" sizes="32x32">
-<title>devbox.localhost</title>
+<link rel="stylesheet" href="//<?= DEVBOX_HOSTNAME ?>/style.css">
+<link rel="icon" type="image/png" href="//<?= DEVBOX_HOSTNAME ?>/img/favicon.png" sizes="32x32">
+<title><?= $page_title ?> • <?= DEVBOX_HOSTNAME ?></title>
 
 <header class="page-header">
-
-  <h1 class="page-title">devbox.localhost</h1>
-
+  <h1 class="page-title"><?= DEVBOX_HOSTNAME ?></h1>
 </header>
 
 <main class="page-main">
-
-  <table class="vhosts">
-    <tr>
-      <th></th>
-      <th><code>DocumentRoot</code></th>
-      <th><code>ServerName</code></th>
-      <th>Links</th>
-    </tr>
-    <?php foreach (find_projects() as $p): ?>
-      <tr>
-	<td>
-	  <img class="project-icon" src="/img/icon-<?= $p->type ?>.png" alt="<?= $p->type ?>">
-	</td>
-
-	<td>
-	  <code><?= $p->documentRoot ?></code>
-	</td>
-
-	<td>
-	  <a href="http://<?= $p->serverName ?>"><?= $p->serverName ?></a>
-	</td>
-
-	<td class="project-links">
-	  <?= $p->links() ?>
-	</td>
-      </tr>
-    <?php endforeach; ?>
-  </table>
-
+  <?= $page_body ?>
 </main>
 
 <footer class="page-footer">

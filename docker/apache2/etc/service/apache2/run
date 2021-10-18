@@ -1,4 +1,5 @@
 #!/bin/bash
+install -m 755 -d /run/apache2/devbox-vhosts -o devbox -g devbox
 apachectl -D FOREGROUND \
   2> >(log-prefix \! apache2) \
   1> >(log-prefix . apache2)

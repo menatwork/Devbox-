@@ -17,9 +17,6 @@ fi
 docker_args=(
   build
 
-  --build-arg DEVBOX_UID="$(id -u)"
-  --build-arg DEVBOX_GID="$(id -g)"
-
   --tag "$devbox_image:$image_tag"
 
   ./docker

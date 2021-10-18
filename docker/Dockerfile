@@ -1,11 +1,5 @@
 FROM ubuntu:focal
 
-ARG DEVBOX_UID
-ARG DEVBOX_GID
-
-RUN usermod -u "$DEVBOX_UID" www-data
-RUN groupmod -g "$DEVBOX_GID" www-data
-
 COPY base /
 
 RUN build-helper update \

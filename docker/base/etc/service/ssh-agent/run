@@ -1,4 +1,5 @@
 #!/bin/bash
-chpst -u www-data ssh-agent -a /run/ssh-agent/.sock -D \
+install -m 750 -d /run/ssh-agent -o devbox -g devbox
+chpst -u devbox ssh-agent -a /run/ssh-agent/.sock -D \
   2> >(log-prefix \! ssh-agent) \
   1> /dev/null

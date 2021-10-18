@@ -20,7 +20,8 @@ docker_args=(
   --volume "$devbox_volume_logs"://var/log
   --volume "$devbox_shell_dir"://shell
 
-  --volume "$DEVBOX_PROJECTS_DIR"://projects
+  --env DEVBOX_UID="$(id --user)"
+  --env DEVBOX_GID="$(id --group)"
 
   --publish 80:80
   --publish 3306:3306

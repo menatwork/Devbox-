@@ -18,7 +18,9 @@ docker_args=(
   --volume "$devbox_volume_mysql"://var/lib/mysql
   --volume "$devbox_volume_sessions"://var/lib/php/sessions
   --volume "$devbox_volume_logs"://var/log
-  --volume "$devbox_shell_dir"://shell
+  --volume "$devbox_shell_dir"://var/www/shell
+
+  --volume "$DEVBOX_PROJECTS_DIR"://var/www/projects
 
   --env DEVBOX_UID="$(id --user)"
   --env DEVBOX_GID="$(id --group)"

@@ -1,6 +1,5 @@
 <?php
-define("DEVBOX_PROJECTS_DIR"    , "/projects");
-define("DEVBOX_HOSTNAME"        , "devbox.localhost");
+define('DEVBOX_PROJECTS_DIR'    , '/var/www/projects');
 
 define("PROJECT_TYPE_UNKNOWN"   , "unknown");
 define("PROJECT_TYPE_CONTAO3"   , "contao3");

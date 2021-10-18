@@ -1,5 +1,5 @@
 general:
-  projects_root: /projects
+  projects_root: /var/www/projects
   schema_file: .devbox.yml
 
 php:

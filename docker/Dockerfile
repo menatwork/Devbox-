@@ -1,5 +1,7 @@
 FROM ubuntu:focal
 
+ARG DEVBOX_VERSION
+
 COPY base /
 
 RUN build-helper update \
@@ -25,5 +27,7 @@ COPY devbox-py /
 RUN build-helper run /install-devbox-py.sh
 
 RUN build-helper shrink
+
+RUN echo ${DEVBOX_VERSION} > /etc/devbox/version
 
 ENTRYPOINT [ "/init" ]

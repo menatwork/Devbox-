@@ -13,9 +13,14 @@ install -m 750 -d /var/www/.yarn  -o devbox -g devbox
 chown --recursive devbox: /var/www/.cache
 
 cat <<EOF
-┌─────────────────────────────────┐
-│ Zis is ze devbox. It boxes dev. │
-└─────────────────────────────────┘
+
+  MEN AT WORK Devbox $(cat /etc/devbox/version)
+
+  Dashboard:    http://devbox.localhost
+  Mailcatcher:  http://mailcatcher.devbox.localhost
+
+  MariaDB:      localhost:3306, user/password: devbox
+
 EOF
 
 trap "on_exit" EXIT

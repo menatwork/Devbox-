@@ -14,6 +14,8 @@ esac
 docker_args=(
   run
 
+  --volume /etc/localtime:/etc/localtime:ro
+
   --volume "$devbox_volume_cache"://var/www/.cache
   --volume "$devbox_volume_mysql"://var/lib/mysql
   --volume "$devbox_volume_sessions"://var/lib/php/sessions

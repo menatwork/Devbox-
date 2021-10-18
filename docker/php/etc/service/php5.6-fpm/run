@@ -1,6 +1,0 @@
-#!/bin/bash
-php-fpm5.6 \
-  --nodaemonize \
-  --fpm-config /etc/php/5.6/fpm/php-fpm.conf \
-  2> >(log-prefix \! php-fpm5.6) \
-  1> >(log-prefix . php-fpm5.6)

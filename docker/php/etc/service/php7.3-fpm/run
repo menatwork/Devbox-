@@ -1,6 +1,0 @@
-#!/bin/bash
-php-fpm7.3 \
-  --nodaemonize \
-  --fpm-config /etc/php/7.3/fpm/php-fpm.conf \
-  2> >(log-prefix \! php-fpm7.3) \
-  1> >(log-prefix . php-fpm7.3)

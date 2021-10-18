@@ -6,7 +6,7 @@ COPY base /
 
 RUN build-helper update \
   && build-helper upgrade \
-  && build-helper install runit git openssh-client
+  && build-helper install runit git openssh-client htop
 
 COPY apache2 /
 RUN build-helper run /install-apache2.sh

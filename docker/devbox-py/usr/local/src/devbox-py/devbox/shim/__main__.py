@@ -3,6 +3,7 @@ import os
 import shutil
 import sys
 
+from .. import util
 from ..config import Config
 from ..schema import Schema
 
@@ -10,13 +11,14 @@ from ..schema import Schema
 def main():
     logging.basicConfig(level=logging.DEBUG)
 
+    util.create_and_become_devbox_user()
+
     shim_name = sys.argv[1]
 
     program = resolve_shim_to_program(shim_name)
     args = sys.argv[2:]
 
     logging.debug(f"os.execl({program}, {shim_name}, *{args})")
-
     os.execl(program, shim_name, *args)
 
 

@@ -10,10 +10,12 @@ shim() {
 
   run_args=(
     --network host
-    --user "$(id --user):$(id --group)"
     --interactive
     --tty
     --rm
+
+    --env DEVBOX_UID="$(id --user)"
+    --env DEVBOX_GID="$(id --group)"
 
     --env DEVBOX_IMAGE="$devbox_image"
     --env DEVBOX_PROJECTS_DIR="$DEVBOX_PROJECTS_DIR"

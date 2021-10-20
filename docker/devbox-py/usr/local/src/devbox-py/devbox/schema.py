@@ -7,6 +7,10 @@ class SchemaError(Exception):
     pass
 
 
+class SchemaNotFound(SchemaError):
+    pass
+
+
 class Schema(object):
     # note: cerberus calls this "spec" a "schema" as well, but we'll refer to it
     # as a spec to avoid confusion with our schema files (.devbox.yml)
@@ -22,6 +26,26 @@ class Schema(object):
             }
         }
     }
+
+    @staticmethod
+    def find_and_load(boundary: str):
+        d = os.getcwd()
+
+        if d != boundary and not d.startswith(boundary):
+            raise ValueError(f"boundary ({boundary}) is outside of cwd ({d})")
+
+        while d.startswith(boundary):
+            schema_file = os.path.join(d, '.devbox.yml')
+
+            if os.path.isfile(schema_file) or os.path.islink(schema_file):
+                return Schema(schema_file)
+
+            if d == '/':
+                break
+
+            d = os.path.dirname(d)
+
+        raise SchemaNotFound()
 
     def __init__(self, path: str):
         try:

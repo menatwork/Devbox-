@@ -1,26 +1,47 @@
+install_php_versions() {
+  local p=()
+
+  for version; do
+    local prefix="php$version"
+
+    p+=(
+      "$prefix-curl"
+      "$prefix-fpm"
+      "$prefix-gd"
+      "$prefix-imagick"
+      "$prefix-intl"
+      "$prefix-mbstring"
+      "$prefix-mysql"
+      "$prefix-soap"
+      "$prefix-xml"
+      "$prefix-yaml"
+      "$prefix-zip"
+    )
+
+    if [[ "$version" == 5.6 ]]; then
+      p+=("$prefix-mcrypt")
+    fi
+  done
+
+  build-helper install "${p[@]}"
+}
+
 build-helper install software-properties-common gnupg curl unzip
 apt-add-repository --yes ppa:ondrej/php > /dev/null
 
-composer_1_version=1.10.22
-composer_2_version=2.1.8
+composer_1_version=1.10.23
+composer_2_version=2.1.9
 
-pkgs=(
-  php7.4-fpm php7.4-xml php7.4-curl php7.4-intl php7.4-gd php7.4-imagick
-  php7.4-mbstring php7.4-zip php7.4-mysql php7.4-soap php7.4-yaml
+install_php_versions 5.6 7.3 7.4 8.0
 
-  php7.3-fpm php7.3-xml php7.3-curl php7.3-intl php7.3-gd php7.3-imagick
-  php7.3-mbstring php7.3-zip php7.3-mysql php7.3-soap php7.3-yaml
+# the default binary should never be called, that's what the php shim inside the
+# container is for
+rm /usr/bin/php
 
-  php5.6-fpm php5.6-xml php5.6-curl php5.6-intl php5.6-gd php5.6-imagick
-  php5.6-mbstring php5.6-zip php5.6-mysql php5.6-soap php5.6-mcrypt
-)
-
-build-helper install "${pkgs[@]}"
-
-curl --silent --location --output /usr/local/bin/composer1 \
-    https://getcomposer.org/download/"$composer_1_version"/composer.phar
-
-curl --silent --location --output /usr/local/bin/composer \
-    https://getcomposer.org/download/"$composer_2_version"/composer.phar
+curl --silent --location \
+    https://getcomposer.org/download/"$composer_1_version"/composer.phar \
+    --output /usr/local/bin/composer1 \
+    https://getcomposer.org/download/"$composer_2_version"/composer.phar \
+    --output /usr/local/bin/composer
 
 chmod +x /usr/local/bin/composer1 /usr/local/bin/composer

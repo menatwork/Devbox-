@@ -5,6 +5,9 @@ general:
 php:
   default_version: "7.4"
   versions:
+    "8.0":
+      socket: /run/php/php8.0-fpm.sock
+      binary: /usr/bin/php8.0
     "7.4":
       socket: /run/php/php7.4-fpm.sock
       binary: /usr/bin/php7.4

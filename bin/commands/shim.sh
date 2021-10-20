@@ -8,6 +8,7 @@ shim() {
   local docker_args=(
     --user devbox:devbox
     --env SSH_AUTH_SOCK=/run/ssh-agent.socket
+    --interactive
   )
 
   # This check is necessary because Docker will complain about input pipes when

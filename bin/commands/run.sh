@@ -1,5 +1,5 @@
-# NOTE: double slashes at the start of volume names are required for win32
-# compatibility
+# NOTE: double slashes at the start of volume mount points are required for
+# win32 compatibility
 
 load_dotenv_or_die DEVBOX_PROJECTS_DIR
 
@@ -11,12 +11,20 @@ case "$#" in
     exit 1
 esac
 
+docker_args=()
+
+if [[ -v SSH_AUTH_SOCK ]]; then
+  echo_debug "Mapping host SSH_AUTH_SOCK"
+  docker_args+=(--volume "$SSH_AUTH_SOCK"://run/ssh-agent.socket)
+fi
+
+if [[ -e /etc/localtime ]]; then
+  echo_debug "Mapping host timezone"
+  docker_args+=(--volume /etc/localtime://etc/localtime:ro)
+fi
+
 docker_args=(
-  run
-
-  --volume /etc/localtime:/etc/localtime:ro
-
-  --volume "$devbox_volume_cache"://var/www/.cache
+  --volume "$devbox_volume_cache"://home/devbox/.cache
   --volume "$devbox_volume_mysql"://var/lib/mysql
   --volume "$devbox_volume_sessions"://var/lib/php/sessions
   --volume "$devbox_volume_logs"://var/log
@@ -38,4 +46,4 @@ docker_args=(
   "$devbox_image:$image_tag"
 )
 
-devbox_docker "${docker_args[@]}"
+devbox_docker run "${docker_args[@]}"

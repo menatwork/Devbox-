@@ -11,9 +11,10 @@ devbox_docker_registry=gitlab.men-at-work.de:4774
 devbox_image="$devbox_docker_registry/entwicklung/devbox"
 
 devbox_volume_cache=devbox-cache
-devbox_volume_mysql=devbox-mysql
-devbox_volume_sessions=devbox-sessions
 devbox_volume_logs=devbox-logs
+devbox_volume_mysql=devbox-mysql
+devbox_volume_projects=devbox-projects
+devbox_volume_sessions=devbox-sessions
 
 main() {
   if [[ $# < 1 ]]; then
@@ -91,6 +92,40 @@ load_dotenv_or_die() {
   if [[ "$all_present" != 1 ]]; then
     exit 1
   fi
+}
+
+# Translate $PWD to its corresponding path in the devbox container.
+#
+# This will print an error and exit with status code 1 if $PWD isn't
+# in $devbox_projects_dir.
+devbox_pwd_in_container() {
+  local real_projects_dir="$(_path_windows_to_unix "$DEVBOX_PROJECTS_DIR")"
+
+  if [[ ! "$PWD" =~ ^"$real_projects_dir" ]]; then
+    return 1
+  fi
+
+  local relative_dir="${PWD#$real_projects_dir}"
+
+  printf %s "/var/www/projects$relative_dir"
+}
+
+# Translate Windows-style paths into Msys format.
+#
+# E.g., C:\Public\Foobar → /c/Public/Foobar
+#
+# Paths are returned unchanged if they don't start with "C:\".
+_path_windows_to_unix() {
+  if [[ "$1" =~ ^C:\\ ]]; then
+    local result="$1"
+
+    result="${1/#C:/\/c}"      # replace "C:" with "/c"
+    result="${result//\\/\/}"  # replace all "\" with "/"
+
+    set -- "$result"
+  fi
+
+  printf %s "$1"
 }
 
 main "$@"

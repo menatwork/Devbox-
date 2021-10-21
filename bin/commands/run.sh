@@ -23,7 +23,7 @@ if [[ -e /etc/localtime ]]; then
   docker_args+=(--volume /etc/localtime://etc/localtime:ro)
 fi
 
-docker_args=(
+docker_args+=(
   --volume "$devbox_volume_cache"://home/devbox/.cache
   --volume "$devbox_volume_mysql"://var/lib/mysql
   --volume "$devbox_volume_sessions"://var/lib/php/sessions

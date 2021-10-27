@@ -3,6 +3,10 @@
 
 load_dotenv_or_die DEVBOX_PROJECTS_DIR
 
+if [[ ! -v DEVBOX_PROJECTS_VOLUME ]]; then
+  DEVBOX_PROJECTS_VOLUME="$DEVBOX_PROJECTS_DIR"
+fi
+
 case "$#" in
   0) image_tag="latest" ;;
   1) image_tag="$1" ;;
@@ -15,7 +19,7 @@ docker_args=()
 
 if [[ -v SSH_AUTH_SOCK ]]; then
   echo_debug "Mapping host SSH_AUTH_SOCK"
-  docker_args+=(--volume "$SSH_AUTH_SOCK"://run/ssh-agent.socket)
+  docker_args+=(--volume "$SSH_AUTH_SOCK"://run/ssh-agent-host.socket)
 fi
 
 if [[ -e /etc/localtime ]]; then
@@ -24,13 +28,14 @@ if [[ -e /etc/localtime ]]; then
 fi
 
 docker_args+=(
-  --volume "$devbox_volume_cache"://home/devbox/.cache
+  --volume "$devbox_src_dir"/logs://var/log
   --volume "$devbox_volume_mysql"://var/lib/mysql
-  --volume "$devbox_volume_sessions"://var/lib/php/sessions
-  --volume "$devbox_volume_logs"://var/log
-  --volume "$devbox_shell_dir"://var/www/shell
+  --volume "$devbox_volume_php_sessions"://var/lib/php/sessions
 
-  --volume "$DEVBOX_PROJECTS_DIR"://var/www/projects
+  --volume "$devbox_volume_user_home"://home/devbox
+
+  --volume "$DEVBOX_PROJECTS_VOLUME"://var/www/projects
+  --volume "$devbox_shell_dir"://var/www/shell
 
   --env DEVBOX_UID="$(id --user)"
   --env DEVBOX_GID="$(id --group)"

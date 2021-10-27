@@ -11,10 +11,10 @@ devbox_docker_registry=gitlab.men-at-work.de:4774
 devbox_image="$devbox_docker_registry/entwicklung/devbox"
 
 devbox_volume_cache=devbox-cache
-devbox_volume_logs=devbox-logs
+devbox_volume_user_home=devbox-user-home
 devbox_volume_mysql=devbox-mysql
 devbox_volume_projects=devbox-projects
-devbox_volume_sessions=devbox-sessions
+devbox_volume_php_sessions=devbox-php-sessions
 
 main() {
   if [[ $# < 1 ]]; then

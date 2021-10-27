@@ -5,12 +5,26 @@ set -euo pipefail
 groupadd --gid "$DEVBOX_GID" devbox
 useradd --uid "$DEVBOX_UID" --gid "$DEVBOX_GID" devbox
 
-# Set up state directories used by various tools
-install -m 750 -d /var/www/.cache -o devbox -g devbox
-install -m 750 -d /var/www/.yarn  -o devbox -g devbox
+# Create runtime dirs that don't exist yet
+d=(
+  /run/apache2/devbox-vhosts
+  /run/mysqld
+  /run/php
+  /var/log/apache2
+  /var/log/mysql
+)
+install -m 755 -d "${d[@]}"
 
-# Ensure volume permissions are correct
-chown --recursive devbox: /var/www/.cache
+# Ensure devbox user can access everything it needs
+d=(
+  /etc/service
+  /home/devbox
+  /run
+  /var/lib/mysql
+  /var/lock
+  /var/log
+)
+chown --recursive devbox:devbox "${d[@]}"
 
 cat <<EOF
 
@@ -29,6 +43,6 @@ on_exit() {
   kill -HUP $pid
 }
 
-runsvdir /etc/service &
+chpst -u devbox runsvdir /etc/service &
 pid=$!
 wait

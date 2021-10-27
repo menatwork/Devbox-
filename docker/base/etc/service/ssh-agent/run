@@ -1,5 +1,4 @@
 #!/bin/bash
-install -m 750 -d /run/ssh-agent -o devbox -g devbox
-chpst -u devbox ssh-agent -a /run/ssh-agent/.sock -D \
+ssh-agent -a /run/ssh-agent-devbox.socket -D \
   2> >(log-prefix \! ssh-agent) \
   1> /dev/null

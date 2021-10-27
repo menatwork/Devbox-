@@ -21,8 +21,8 @@ shim() {
   if [[ "$workdir" != "" ]]; then
     docker_args+=(--workdir "$workdir")
   else
-    echo_error "Shim wurde nicht in $DEVBOX_PROJECTS_DIR ausgeführt, Pfad kann nicht gemappt werden"
-    return 1
+    echo_warning "Shim wurde nicht in $DEVBOX_PROJECTS_DIR ausgeführt, Pfad kann nicht gemappt werden"
+    docker_args+=(--workdir "/")
   fi
 
   devbox_docker exec "${docker_args[@]}" devbox devbox-shim "$@"

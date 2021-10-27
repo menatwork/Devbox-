@@ -1,2 +1,0 @@
-#!/bin/sh
-exec devbox-run-php-fpm 5.6

@@ -9,12 +9,14 @@ verschiedener Entwicklungsprozesse erforderlich sind.
 
 # Beispiel
 ```yaml
-version: 1
+version: '1'
 
-project:
-  type: craftcms3
-  webroot: backend/web
-  php: '7.3'
+type: craftcms3
+webroot: backend/web
+php: '7.3'
+
+resources:
+  - web/assets
 
 servers:
   cyon:
@@ -42,16 +44,12 @@ instances:
 
 ## `version`
 
-* Mögliche Werte: `1`
+* Mögliche Werte: `'1'`
 
 Version des Schemas zum Erhalt der Abwärtskompatibilität, sollten später größere
 Änderungen am Schemaformat erforderlich werden.
 
-## `project`
-
-Eigenschaften des Projektes.
-
-### `project.type`
+## `type`
 
 Typ des Projektes (normalerweise das verwendete Framework).
 
@@ -60,7 +58,7 @@ Mögliche Werte: `craftcms3`, `contao3`, `contao4`
 Dieser Wert ist für Datenbankoperationen sowie Schnellzugriffslinks auf der
 devbox-Übersichtsseite erforderlich.
 
-### `project.webroot`
+## `webroot`
 
 Verzeichnis, das als DocumentRoot für das Projekt gelten soll. Der Pfad wird
 relativ zum Wurzelverzeichnis des Projekt-Repositorys angegeben.
@@ -68,10 +66,19 @@ relativ zum Wurzelverzeichnis des Projekt-Repositorys angegeben.
 Wenn das Web-Verzeichnis wie beispielsweise bei Contao 3 gleich dem
 Wurzelverzeichnis des Repositorys ist, muss `.` angegeben werden.
 
-### `project.php`
+## `php`
 
 Zu verwendende PHP-Version. Die verfügbaren Versionen richten sich nach der
 Devbox-Version.
+
+## `resources`
+
+Eine Liste von Pfaden, unter denen dynamische Seitenressourcen liegen. Dateien
+in diesen Pfaden werden generell nicht ins Repository aufgenommen und müssen
+deshalb separat behandelt werden.
+
+Diese Option wird z.B. von `devbox sync` verwendet, um Seitendaten von einer
+Remote-Instanz zu beziehen.
 
 ## `servers`
 

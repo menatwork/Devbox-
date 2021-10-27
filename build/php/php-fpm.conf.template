@@ -1,0 +1,15 @@
+[global]
+error_log = /var/log/php/{PREFIX}-fpm.log
+
+[devbox]
+listen = /run/devbox-sockets/{PREFIX}
+
+pm = static
+pm.max_children = 16
+
+php_flag[display_errors] = on
+php_admin_value[error_log] = /var/log/php/{PREFIX}-error.log
+php_admin_flag[log_errors] = on
+php_admin_value[memory_limit] = -1
+php_admin_value[max_execution_time] = 0
+php_admin_value[max_input_vars] = 10000

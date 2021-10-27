@@ -1,6 +1,0 @@
-#!/bin/bash
-mailcatcher \
-  --foreground \
-  --http-ip 127.0.0.1 \
-  --no-quit \
-  &> /var/log/mailcatcher.log

@@ -33,7 +33,7 @@ build() {
     --build-arg DEVBOX_BASE_IMAGE="$base_image" \
     --build-arg DEVBOX_VERSION="$version" \
     --tag "$tag" \
-    ./docker
+    .
 }
 
 build "$@"

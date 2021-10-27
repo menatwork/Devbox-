@@ -1,0 +1,10 @@
+<VirtualHost *:80>
+  ServerName "{{ name }}.devbox.localhost"
+  DocumentRoot "{{ document_root }}"
+
+  <FilesMatch "\.ph(p|ar)$">
+    <If "-f %{SCRIPT_FILENAME}">
+      SetHandler "proxy:unix:{{ php_socket }}|fcgi://localhost"
+    </If>
+  </FilesMatch>
+</VirtualHost>

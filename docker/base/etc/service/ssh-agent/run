@@ -1,4 +1,0 @@
-#!/bin/bash
-ssh-agent -a /run/ssh-agent-devbox.socket -D \
-  2> >(log-prefix \! ssh-agent) \
-  1> /dev/null

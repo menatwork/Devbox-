@@ -7,7 +7,7 @@ shim() {
 
   local docker_args=(
     --user devbox:devbox
-    --env SSH_AUTH_SOCK=/run/ssh-agent.socket
+    --env SSH_AUTH_SOCK=/run/ssh-agent-host.socket
     --interactive
   )
 

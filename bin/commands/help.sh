@@ -7,6 +7,7 @@ echo -e "
     run         den Devbox-Container im Vordergrund ausführen
     exec ...    einen Befehl im laufenden Container ausführen
     shell-init  Shellcode zum Pfad-Setup erzeugen
+    open        Aktuelles Projekt im Browser öffnen
     help        diesen Hilfetext anzeigen
 
   \e[1mWartung\e[0m

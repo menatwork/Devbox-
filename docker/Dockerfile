@@ -2,10 +2,7 @@ ARG DEVBOX_BASE_IMAGE
 FROM ${DEVBOX_BASE_IMAGE}
 
 COPY base /
-
-RUN build-helper update \
-  && build-helper upgrade \
-  && build-helper install runit git openssh-client htop rsync
+RUN build-helper run /install-base.sh
 
 COPY apache2 /
 RUN build-helper run /install-apache2.sh

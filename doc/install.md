@@ -1,4 +1,4 @@
-# Devbox-Installation
+# Installation
 
 Hier wird die Installation der Devbox auf unterstützten Systemen beschrieben.
 

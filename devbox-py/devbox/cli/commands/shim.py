@@ -1,12 +1,13 @@
 from dataclasses import dataclass
 import logging
 import os
+import pprint
 import sys
 
 from devbox.cli import Context, Error
 from devbox.cli.util import find_binary
 from devbox.config import Config as DevboxConfig
-from devbox.schema import Schema, SchemaNotFound
+from devbox.schema import Schema, SchemaNotFound, InvalidSchema
 
 
 name = 'shim'
@@ -36,7 +37,11 @@ def call(ctx: Context):
 
     logging.debug(f"shim called with: {ctx.args}")
 
-    shim_call = resolve_shim(ctx)
+    try:
+        shim_call = resolve_shim(ctx)
+    except InvalidSchema as e:
+        formatted_errors = pprint.pformat(e.errors)
+        raise Error(f"Fehlerhafte Schemadatei:\n\n\t{e.file_path}\n\n{formatted_errors}")
 
     docker_args = [
         '--rm',
@@ -133,7 +138,7 @@ def select_php_binary(rc: ResolverContext) -> str:
 
     try:
         schema = Schema.find_and_load('/')
-        version_key = schema.project_php_version
+        version_key = schema.project.php
         if not version_key:
             version_key = config.require('php', 'default_version')
             default_php_warning(version_key, "Schema definiert keine PHP-Version")

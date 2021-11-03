@@ -30,10 +30,10 @@ class Autoconf(object):
                 try:
                     schema_file_path = event.schema_file_path()
 
-                    schema = Schema(schema_file_path)
+                    schema = Schema.load_file(schema_file_path)
                     schemas_by_project_dir[event.project_dir] = schema
 
-                    logging.info(f"{schema.name}: updating vhost config")
+                    logging.info(f"{schema.project_name}: updating vhost config")
                     self.vhost_update(schema)
                 except SchemaError as e:
                     logging.error(f"{schema_file_path}: {e}")
@@ -44,7 +44,7 @@ class Autoconf(object):
             elif event.is_gone():
                 try:
                     schema = schemas_by_project_dir.pop(event.project_dir)
-                    logging.info(f"{schema.name}: dropping vhost config")
+                    logging.info(f"{schema.project_name}: dropping vhost config")
                     self.vhost_drop(schema)
                 except KeyError:
                     # unrelated directory or file deletion
@@ -64,8 +64,7 @@ class Autoconf(object):
             return
 
         try:
-            vhost_dir = self.cfg.require('autoconf', 'apache2', 'vhost_directory')
-            vhost_file = schema.vhost_file_path(vhost_dir)
+            vhost_file = self.get_apache2_vhost_path(schema)
             with open(vhost_file, 'w') as f:
                 f.write(apache2_config)
         except IOError as e:
@@ -75,10 +74,8 @@ class Autoconf(object):
         self.reload_apache2()
 
     def vhost_drop(self, schema: Schema):
-        vhost_dir = self.cfg.require('autoconf', 'apache2', 'vhost_directory')
-        vhost_file = schema.vhost_file_path(vhost_dir)
+        vhost_file = self.get_apache2_vhost_path(schema)
         os.unlink(vhost_file)
-
         self.reload_apache2()
 
     def reload_apache2(self):
@@ -89,7 +86,7 @@ class Autoconf(object):
 
     def render_apache2_vhost_config(self, schema: Schema) -> str:
         try:
-            wanted_version = schema.project_php_version or self.cfg.require('php', 'default_version')
+            wanted_version = schema.project.php or self.cfg.require('php', 'default_version')
             php_socket = self.cfg.require('php', 'versions', wanted_version, 'socket')
         except KeyError:
             raise SchemaError(f"PHP version unavailable: {wanted_version}")
@@ -99,7 +96,11 @@ class Autoconf(object):
             template = jinja2.Template(f.read())
 
         return template.render(
-            name=schema.name,
-            document_root=os.path.join(schema.project_dir, schema.project_webroot),
+            name=schema.project_name,
+            document_root=os.path.join(schema.project_directory, schema.project.webroot),
             php_socket=php_socket,
         )
+
+    def get_apache2_vhost_path(self, schema: Schema) -> str:
+        dir = self.cfg.require('autoconf', 'apache2', 'vhost_directory')
+        return os.path.join(dir, f'{schema.project_name}.conf')

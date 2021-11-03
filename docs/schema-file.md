@@ -25,7 +25,7 @@ instances:
       host: vsa-wiboxu.cyon.net
       user: riposach
     deployment:
-      type: deployer
+      method: deployer
       dir: ~/public_html/production.riposa.ch
 
   staging:
@@ -33,7 +33,7 @@ instances:
       host: vsa-wiboxu.cyon.net
       user: riposach
     deployment:
-      type: deployer
+      method: deployer
       dir: ~/public_html/staging.riposa.ch
 
   develop:
@@ -41,7 +41,7 @@ instances:
       host: vsa-wiboxu.cyon.net
       user: riposach
     deployment:
-      type: deployer
+      method: deployer
       dir: ~/public_html/develop.riposa.ch
 ```
 

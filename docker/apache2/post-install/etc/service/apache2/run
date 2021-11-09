@@ -1,0 +1,4 @@
+#!/bin/bash
+apachectl -D FOREGROUND \
+  2> >(log-prefix \! apache2) \
+  1> >(log-prefix . apache2)

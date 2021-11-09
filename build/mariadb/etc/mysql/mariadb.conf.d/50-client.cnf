@@ -1,9 +1,0 @@
-[client]
-user=devbox
-password=devbox
-socket=/run/devbox-sockets/mariadb
-
-[mysqldump]
-user=devbox
-password=devbox
-socket=/run/devbox-sockets/mariadb

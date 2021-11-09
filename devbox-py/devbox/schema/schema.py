@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import Optional
 import os
+import pprint
 import yaml
 
 import cerberus
@@ -17,10 +18,13 @@ class InvalidSchema(SchemaError):
     errors: dict
     file_path: Optional[str]
 
-    def __init__(self, errors: dict, file_path: Optional[str] = None):
+    def __init__(self, errors: dict, file_path: Optional[str] = None) -> None:
         super().__init__(self)
         self.errors = errors
         self.file_path = file_path
+    
+    def __str__(self) -> str:
+        return f"{self.file_path}: invalid schema: {pprint.pformat(self.errors)}"
 
 
 @dataclass
@@ -144,7 +148,7 @@ class Schema(object):
 
         self.project = Project(**data['project'])
 
-        if instances := data['instances']:
+        if instances := data.get('instances'):
             self.instances = {}
             for (name, inst) in instances.items():
                 self.instances[name] = Instance(inst)

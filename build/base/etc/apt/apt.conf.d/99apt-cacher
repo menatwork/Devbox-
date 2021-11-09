@@ -1,2 +1,0 @@
-Acquire::http::Proxy "http://devbox.men-at-work.de:3142/";
-Acquire::https::Proxy "DIRECT";

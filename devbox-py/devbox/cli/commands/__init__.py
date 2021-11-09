@@ -30,7 +30,7 @@ def find_command(s: str) -> any:
     raise UsageError("Unbekannter Befehl!")
 
 
-from . import browser, build, exec, pull, push, run, shell_init, shim
+from . import browser, build, exec, pull, push, run, shell_init
 
 
 COMMANDS = [
@@ -41,7 +41,6 @@ COMMANDS = [
     push,
     run,
     shell_init,
-    shim,
 ]
 
 

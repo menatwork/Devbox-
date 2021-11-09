@@ -18,12 +18,11 @@ def main() -> NoReturn:
         config = load_dotenv_config(os.path.join(repo_dir, '.env'))
     except ConfigError:
         fail(".env konnte nicht geladen werden")
-
+    
     ctx = Context(
         args=args,
-        repo_dir=repo_dir,
         config=config,
-        devbox_image='gitlab.men-at-work.de:4774/entwicklung/devbox',
+        repo_dir=repo_dir,
     )
 
     try:

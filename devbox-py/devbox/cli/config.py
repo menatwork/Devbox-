@@ -11,6 +11,7 @@ class ConfigError(Exception):
 class Config(object):
     projects_dir: str
     projects_volume: str
+    debug: bool
 
 
 def load_dotenv_config(path: str) -> Config:
@@ -38,8 +39,10 @@ def load_dotenv_config(path: str) -> Config:
 
     projects_dir = os.path.normpath(data['DEVBOX_PROJECTS_DIR'])
     projects_volume = data.get('DEVBOX_PROJECTS_VOLUME', projects_dir)
+    debug = data.get('DEVBOX_CLI_DEBUG') == '1'
 
     return Config(
         projects_dir=projects_dir,
         projects_volume=projects_volume,
+        debug=debug,
     )

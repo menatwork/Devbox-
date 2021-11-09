@@ -5,7 +5,7 @@ setup(
     description='Python Devbox tooling',
     author='Tobias Umbach',
     author_email='umbach@men-at-work.de',
-    packages=['devbox.autoconf', 'devbox.shim', 'devbox.cli'],
+    packages=['devbox.autoconf'],
     install_requires=[
         'cerberus>=1.3',
         'inotify>=0.2',
@@ -15,8 +15,6 @@ setup(
     entry_points={
         'console_scripts': [
             'devbox-autoconf=devbox.autoconf.__main__:main',
-            'devbox-shim=devbox.shim.__main__:main',
-            'devbox-cli=devbox.cli.__main__:main',
         ]
     }
 )

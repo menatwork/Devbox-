@@ -13,6 +13,5 @@ class Error(Exception):
 class Context(object):
     args: 'list[str]'
     config: Config
-
-    devbox_image: str
     repo_dir: str
+    devbox_image: str = 'gitlab.men-at-work.de:4774/entwicklung/devbox'

@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [[ $# != 1 ]]; then
+  >&2 echo "invalid number of arguments: $#"
+  >&2 echo "usage: $0 PHP_VERSION"
+  exit 1
+fi
+
+version="$1"
+
+"php-fpm$version" \
+  --nodaemonize \
+  --fpm-config "/etc/php/$version/fpm/php-fpm.conf" \
+  2> >(log-prefix \! php-fpm$version) \
+  1> >(log-prefix . php-fpm$version)

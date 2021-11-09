@@ -1,2 +1,2 @@
 #!/bin/sh
-exec devbox shim "$0" "$@"
+exec devbox run "$0" "$@"

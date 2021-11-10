@@ -21,6 +21,8 @@ def call(ctx: Context) -> None:
     else:
         docker_args = other_command_args(ctx)
 
+    logging.debug(docker_args)
+
     os.execv(find_binary('docker'), docker_args)
 
 
@@ -39,7 +41,12 @@ def server_args(ctx: Context) -> List[str]:
 def other_command_args(ctx: Context) -> List[str]:
     try:
         args = common_args(ctx)
+        args.extend([
+            '--volume', f'{os.getcwd()}:/mnt',
+            '--workdir', '/mnt',
+        ])
         args.append(ctx.devbox_image)
+        args.extend(['runuser', '-u', 'devbox', '--'])
         args.extend(resolve_shim(ctx))
         return args
     except InvalidSchema as e:

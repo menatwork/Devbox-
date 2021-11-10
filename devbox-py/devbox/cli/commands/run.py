@@ -1,3 +1,4 @@
+from typing import List
 import logging
 import os
 import pprint
@@ -14,7 +15,7 @@ short_help = "Befehle im Devbox-Container ausführen"
 long_help = "TODO"
 
 
-def call(ctx: Context):
+def call(ctx: Context) -> None:
     if len(ctx.args) == 0:
         docker_args = server_args(ctx)
     else:
@@ -23,7 +24,7 @@ def call(ctx: Context):
     os.execv(find_binary('docker'), docker_args)
 
 
-def server_args(ctx: Context):
+def server_args(ctx: Context) -> List[str]:
     args = common_args(ctx)
     args.extend([
         '--name', 'devbox-server',
@@ -35,7 +36,7 @@ def server_args(ctx: Context):
     return args
 
 
-def other_command_args(ctx: Context):
+def other_command_args(ctx: Context) -> List[str]:
     try:
         args = common_args(ctx)
         args.append(ctx.devbox_image)
@@ -43,10 +44,14 @@ def other_command_args(ctx: Context):
         return args
     except InvalidSchema as e:
         formatted_errors = pprint.pformat(e.errors)
-        raise Error(f"Fehlerhafte Schemadatei:\n\n\t{e.file_path}\n\n{formatted_errors}")
+        raise Error(
+            "Fehlerhafte Schemadatei:\n\n"
+            f"\t{e.file_path}\n\n"
+            f"{formatted_errors}"
+        )
 
 
-def common_args(ctx: Context) -> 'list[str]':
+def common_args(ctx: Context) -> List[str]:
     args = [
         'docker',
         'run',
@@ -60,7 +65,7 @@ def common_args(ctx: Context) -> 'list[str]':
         '--volume', f'{ctx.config.projects_volume}:/var/www/projects',
         '--volume', f'{ctx.repo_dir}/volumes/devbox-home:/home/devbox',
         '--volume', f'{ctx.repo_dir}/volumes/mariadb:/var/lib/mysql',
-        '--volume', f'{ctx.repo_dir}/volumes/php-sessions:/var/lib/php/sessions',
+        '--volume', f'{ctx.repo_dir}/volumes/php-sessions:/var/lib/php/sessions',  # noqa: E501
 
         '--env', f'DEVBOX_UID={os.getuid()}',
         '--env', f'DEVBOX_GID={os.getgid()}',
@@ -68,7 +73,10 @@ def common_args(ctx: Context) -> 'list[str]':
 
     if ctx.config.debug:
         logging.debug('Debug mode is on, mapping devbox-py')
-        args.extend(['--volume', f'{ctx.repo_dir}/devbox-py/devbox:/src/devbox-py/devbox'])
+        args.extend([
+            '--volume',
+            f'{ctx.repo_dir}/devbox-py/devbox:/src/devbox-py/devbox'
+        ])
 
     if os.path.exists('/etc/localtime'):
         logging.debug("Mapping host timezone")
@@ -84,5 +92,5 @@ def common_args(ctx: Context) -> 'list[str]':
             '--volume', f'{ssh_auth_sock}:/run/ssh-agent-host.sock',
             '--env', f'SSH_AUTH_SOCK={ssh_auth_sock}',
         ])
-    
+
     return args

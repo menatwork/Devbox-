@@ -1,7 +1,10 @@
-from devbox.cli import Context, Error
+from types import ModuleType
+from typing import List
+
+from .. import Context, Error
 
 
-COMMANDS = []
+COMMANDS: List[ModuleType] = []
 
 
 class UsageError(Error):
@@ -12,25 +15,25 @@ class UsageError(Error):
     pass
 
 
-def dispatch(ctx: Context):
+def dispatch(ctx: Context) -> None:
     try:
         cmd_name = ctx.args.pop(0)
     except IndexError:
         raise UsageError("Kein Befehl angegeben!")
 
     cmd_module = find_command(cmd_name)
-    cmd_module.call(ctx)
+    cmd_module.call(ctx)  # type: ignore[attr-defined]
 
 
-def find_command(s: str) -> any:
+def find_command(s: str) -> ModuleType:
     for m in COMMANDS:
-        if m.name == s:
+        if m.name == s:  # type: ignore[attr-defined]
             return m
 
     raise UsageError("Unbekannter Befehl!")
 
 
-from . import browser, build, pull, push, run, shell_init
+from . import browser, build, pull, push, run, shell_init  # noqa: E402
 
 
 COMMANDS = [

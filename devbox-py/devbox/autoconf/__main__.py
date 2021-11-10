@@ -5,7 +5,7 @@ import os
 from .autoconf import Autoconf
 
 
-def main():
+def main() -> None:
     if len(argv) != 1:
         print("error: this program takes no arguments", file=stderr)
         exit(1)

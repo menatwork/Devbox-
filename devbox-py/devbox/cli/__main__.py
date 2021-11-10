@@ -8,7 +8,7 @@ from .config import load_dotenv_config, ConfigError
 import devbox.logging
 
 
-def main() -> NoReturn:
+def main() -> None:
     devbox.logging.init()
 
     args = sys.argv[1:]  # skip program name
@@ -18,7 +18,7 @@ def main() -> NoReturn:
         config = load_dotenv_config(os.path.join(repo_dir, '.env'))
     except ConfigError:
         fail(".env konnte nicht geladen werden")
-    
+
     ctx = Context(
         args=args,
         config=config,

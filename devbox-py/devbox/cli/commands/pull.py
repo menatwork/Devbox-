@@ -10,7 +10,7 @@ short_help = "Devbox-Image neu beziehen"
 long_help = "TODO"
 
 
-def call(ctx: Context):
+def call(ctx: Context) -> None:
     if len(ctx.args) != 0:
         raise UsageError("Zu viele Parameter")
 

@@ -12,16 +12,16 @@ class Autoconf(object):
     """
     Main application object
     """
-    def __init__(self):
+    def __init__(self) -> None:
         self.cfg = Config.load()
 
-    def watch_and_update_vhosts(self):
+    def watch_and_update_vhosts(self) -> None:
         """
         The daemon's main loop, which ingests schema file events from
         `SchemaWatcher` and triggers VHost reconfigurations.
         """
-        projects_root = self.cfg.get('general', 'projects_root')
-        schema_file = self.cfg.get('general', 'schema_file')
+        projects_root = self.cfg.require('general', 'projects_root')
+        schema_file = self.cfg.require('general', 'schema_file')
 
         schemas_by_project_dir = {}
 
@@ -53,7 +53,7 @@ class Autoconf(object):
             else:
                 logging.warn(f"ignoring unknown watcher event: {event}")
 
-    def vhost_update(self, schema: Schema):
+    def vhost_update(self, schema: Schema) -> None:
         try:
             apache2_config = self.render_apache2_vhost_config(schema)
         except IOError as e:
@@ -73,12 +73,12 @@ class Autoconf(object):
 
         self.reload_apache2()
 
-    def vhost_drop(self, schema: Schema):
+    def vhost_drop(self, schema: Schema) -> None:
         vhost_file = self.get_apache2_vhost_path(schema)
         os.unlink(vhost_file)
         self.reload_apache2()
 
-    def reload_apache2(self):
+    def reload_apache2(self) -> None:
         cmd = self.cfg.require('autoconf', 'apache2', 'reload_command')
         r = os.system(cmd)
         if r != 0:
@@ -94,6 +94,12 @@ class Autoconf(object):
         vhost_template = self.cfg.require('autoconf', 'apache2', 'vhost_template')
         with open(vhost_template) as f:
             template = jinja2.Template(f.read())
+        
+        if not schema.project_directory:
+            raise RuntimeError("schema.project_directory is None; this shouldn't happen")
+        
+        if not schema.project.webroot:
+            raise SchemaError("project has no webroot")
 
         return template.render(
             name=schema.project_name,

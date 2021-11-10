@@ -5,8 +5,8 @@ import enum
 import logging
 import os
 
-from inotify.constants import *
-import inotify.adapters
+from inotify.constants import *  # type: ignore
+import inotify.adapters  # type: ignore
 
 
 class WatcherEventType(enum.Enum):
@@ -16,12 +16,9 @@ class WatcherEventType(enum.Enum):
 
     @staticmethod
     def from_inotify_type_names(tn: 'list[str]') -> WatcherEventType:
-        if ('IN_CREATE' in tn or
-            'IN_MOVED_TO' in tn or
-            'IN_CLOSE_WRITE' in tn):
+        if 'IN_CREATE' in tn or 'IN_MOVED_TO' in tn or 'IN_CLOSE_WRITE' in tn:
             return WatcherEventType.NEW_OR_CHANGED
-        elif ('IN_DELETE' in tn or
-              'IN_MOVED_FROM' in tn):
+        elif 'IN_DELETE' in tn or 'IN_MOVED_FROM' in tn:
             return WatcherEventType.GONE
         else:
             return WatcherEventType.UNKNOWN
@@ -41,7 +38,11 @@ class WatcherEvent(object):
     schema_file: Optional[str]
 
     @staticmethod
-    def from_inotify(type_names: 'list[str]', project_dir: str, schema_file: Optional[str]):
+    def from_inotify(
+        type_names: 'list[str]',
+        project_dir: str,
+        schema_file: Optional[str]
+    ) -> WatcherEvent:
         """
         Convenience method to construct an event with its type inferred from a
         list of inotify event types.
@@ -50,33 +51,37 @@ class WatcherEvent(object):
         return WatcherEvent(event_type, project_dir, schema_file)
 
     @staticmethod
-    def new_or_changed(project_dir: str, schema_file: str):
+    def new_or_changed(project_dir: str, schema_file: str) -> WatcherEvent:
         """
         Convenience method to construct a `NEW_OR_CHANGED` event. This type of
         event must always have a value for `schema_file`.
         """
-        return WatcherEvent(WatcherEventType.NEW_OR_CHANGED, project_dir, schema_file)
+        return WatcherEvent(
+            WatcherEventType.NEW_OR_CHANGED, project_dir, schema_file
+        )
 
     @staticmethod
-    def project_dir_gone(project_dir: str):
+    def project_dir_gone(project_dir: str) -> WatcherEvent:
         """
         Convenience method to construct a `GONE` event regarding a project
         directory.
         """
         return WatcherEvent(WatcherEventType.GONE, project_dir, None)
 
-    def is_new_or_changed(self):
+    def is_new_or_changed(self) -> bool:
         return self.event_type == WatcherEventType.NEW_OR_CHANGED
 
-    def is_gone(self):
+    def is_gone(self) -> bool:
         return self.event_type == WatcherEventType.GONE
 
-    def is_unknown(self):
+    def is_unknown(self) -> bool:
         return self.event_type == WatcherEventType.UNKNOWN
 
-    def schema_file_path(self):
+    def schema_file_path(self) -> str:
         if not self.schema_file:
-            raise ValueError("tried to get schema file path from an event without a schema file")
+            raise ValueError(
+                "tried to get file path from an event without a file"
+            )
         return os.path.join(self.project_dir, self.schema_file)
 
 
@@ -106,11 +111,11 @@ class SchemaFileWatcher(object):
     """
 
     PROJECT_ROOT_MASK = (
-        IN_ISDIR | IN_MOVE | IN_CREATE | IN_DELETE | IN_DELETE_SELF | IN_MOVE_SELF
+        IN_ISDIR | IN_MOVE | IN_CREATE | IN_DELETE | IN_DELETE_SELF | IN_MOVE_SELF  # type: ignore
     )
 
     PROJECT_DIR_MASK = (
-        IN_CREATE | IN_DELETE | IN_CLOSE_WRITE | IN_MOVE
+        IN_CREATE | IN_DELETE | IN_CLOSE_WRITE | IN_MOVE  # type: ignore
     )
 
     _projects_root: str
@@ -118,7 +123,7 @@ class SchemaFileWatcher(object):
     _inotify: inotify.adapters.Inotify
     _buffered_events: 'list[WatcherEvent]'
 
-    def __init__(self, projects_root: str, schema_file: str):
+    def __init__(self, projects_root: str, schema_file: str) -> None:
         """
         Create a new schema file watcher.
 
@@ -147,10 +152,10 @@ class SchemaFileWatcher(object):
                     continue
                 self._add_project_dir_watch(entry.path)
 
-    def __iter__(self):
+    def __iter__(self) -> SchemaFileWatcher:
         return self
 
-    def __next__(self):
+    def __next__(self) -> WatcherEvent:  # type: ignore[return]
         """
         Yield the next event.
 
@@ -191,7 +196,7 @@ class SchemaFileWatcher(object):
                 logging.debug("returning buffered event after wait")
                 return self._buffered_events.pop(0)
 
-    def _add_project_dir_watch(self, project_dir: str):
+    def _add_project_dir_watch(self, project_dir: str) -> None:
         self._inotify.add_watch(project_dir, self.PROJECT_DIR_MASK)
 
         schema_file = os.path.join(project_dir, self._schema_file)
@@ -202,7 +207,7 @@ class SchemaFileWatcher(object):
             e = WatcherEvent.new_or_changed(project_dir, schema_file)
             self._buffered_events.append(e)
 
-    def _remove_project_dir_watch(self, project_dir: str):
+    def _remove_project_dir_watch(self, project_dir: str) -> None:
         self._inotify.remove_watch(project_dir)
 
         e = WatcherEvent.project_dir_gone(project_dir)

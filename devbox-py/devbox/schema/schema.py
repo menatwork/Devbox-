@@ -4,7 +4,7 @@ import os
 import pprint
 import yaml
 
-import cerberus
+import cerberus  # type: ignore[import]
 
 from . import SchemaError
 from .rules import SCHEMA_FILE_RULES
@@ -22,9 +22,10 @@ class InvalidSchema(SchemaError):
         super().__init__(self)
         self.errors = errors
         self.file_path = file_path
-    
+
     def __str__(self) -> str:
-        return f"{self.file_path}: invalid schema: {pprint.pformat(self.errors)}"
+        pretty_errors = pprint.pformat(self.errors)
+        return f"{self.file_path}: invalid schema: {pretty_errors}"
 
 
 @dataclass
@@ -34,10 +35,10 @@ class Project(object):
     php: Optional[str] = None
     resources: Optional['list[str]'] = None
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         self._sanitize_unquoted_php_version()
 
-    def _sanitize_unquoted_php_version(self):
+    def _sanitize_unquoted_php_version(self) -> None:
         if type(self.php) == float:
             self.php = str(self.php)
 
@@ -127,13 +128,13 @@ class Schema(object):
         self.init_metadata(file_path)
         self.init_schema_fields(data)
 
-    def validate(self, data: dict, file_path: Optional[str] = None):
+    def validate(self, data: dict, file_path: Optional[str] = None) -> None:
         v = cerberus.Validator(allow_unknown=True)
         v.validate(data, SCHEMA_FILE_RULES)
         if v.errors:
             raise InvalidSchema(v.errors, file_path)
 
-    def init_metadata(self, file_path: Optional[str] = None):
+    def init_metadata(self, file_path: Optional[str] = None) -> None:
         self.file_path = file_path
         if file_path:
             pd = os.path.dirname(file_path)
@@ -143,7 +144,7 @@ class Schema(object):
             self.project_directory = pd
             self.project_name = pn
 
-    def init_schema_fields(self, data: dict):
+    def init_schema_fields(self, data: dict) -> None:
         self.version = data['version']
 
         self.project = Project(**data['project'])
@@ -152,4 +153,3 @@ class Schema(object):
             self.instances = {}
             for (name, inst) in instances.items():
                 self.instances[name] = Instance(inst)
-

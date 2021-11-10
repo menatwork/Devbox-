@@ -11,7 +11,7 @@ short_help = "Devbox-Image bauen"
 long_help = "TODO"
 
 
-def call(ctx: Context):
+def call(ctx: Context) -> None:
     # just in case we're not in the devbox repo
     os.chdir(ctx.repo_dir)
 
@@ -19,7 +19,9 @@ def call(ctx: Context):
     build_tag = 'latest'
 
     if len(ctx.args) == 0:
-        logging.info(f"Keine Version angegeben; Build wird mit ':{build_tag}' getaggt.")
+        logging.info(
+            f"Keine Version angegeben; Build wird mit ':{build_tag}' getaggt."
+        )
 
     elif len(ctx.args) == 1:
         build_tag = ctx.args[0]

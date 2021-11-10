@@ -1,4 +1,7 @@
-import cerberus
+from __future__ import annotations
+from typing import Any, Optional
+
+import cerberus # type: ignore[import]
 import yaml
 
 
@@ -45,7 +48,7 @@ class ConfigError(Exception):
 
 class Config(object):
     @staticmethod
-    def load(file_path='/etc/devbox/config.yml'):
+    def load(file_path: str = '/etc/devbox/config.yml') -> Config:
         with open(file_path) as f:
             data = yaml.load(f, Loader=yaml.SafeLoader)
 
@@ -57,10 +60,10 @@ class Config(object):
 
         return Config(data)
 
-    def __init__(self, data: dict):
+    def __init__(self, data: dict) -> None:
         self.data = data
 
-    def get(self, *path: 'list[str]', default=None):
+    def get(self, *path: str, default: Optional[Any] = None) -> Optional[Any]:
         v = self.data
 
         for part in path[:-1]:
@@ -73,7 +76,7 @@ class Config(object):
         v = v.get(path[-1], default)
         return v
 
-    def require(self, *path: 'list[str]'):
+    def require(self, *path: str) -> Any:
         v = self.get(*path, default=ConfigError)
         if v is ConfigError:
             key = '.'.join(path)

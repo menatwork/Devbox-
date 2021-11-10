@@ -5,7 +5,7 @@ import subprocess
 from devbox.cli import Error
 
 
-def cmd(*args, env: 'dict[str, str]' = None):
+def cmd(*args: str, env: 'dict[str, str]' = None) -> None:
     """
     Convenience function for subprocess.run(..., check=True)
     """
@@ -18,11 +18,11 @@ def cmd(*args, env: 'dict[str, str]' = None):
             raise subprocess.CalledProcessError(returncode, args)
     except KeyboardInterrupt as e:
         if pid:
-            os.waitpid(pid)
+            os.waitpid(pid, 0)
         raise e
 
 
-def cmd_get_stdout(*args) -> str:
+def cmd_get_stdout(*args: str) -> str:
     """
     Convenience function for subprocess.run(..., check=True,
     stdout=subprocess.PIPE) and subsequent output decoding

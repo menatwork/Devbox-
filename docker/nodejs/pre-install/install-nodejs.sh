@@ -1,4 +1,12 @@
+p=(
+  # required by some npm packages
+  build-essential
+  nodejs
+  python2
+  python3
+)
+
 build-helper update
-build-helper install nodejs
+build-helper install "${p[@]}"
+
 npm install -g yarn
-ln --symbolic /var/www/.cache/yarnrc /var/www/.yarnrc

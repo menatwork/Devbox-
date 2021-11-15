@@ -39,16 +39,21 @@ def server_args(ctx: Context) -> List[str]:
 
 
 def other_command_args(ctx: Context) -> List[str]:
+    host_workdir = os.getcwd()
+    if not host_workdir.startswith(ctx.config.projects_dir):
+        raise Error("Nicht im Projektverzeichnis")
+
+    args = common_args(ctx)
+
+    workdir = host_workdir.replace(ctx.config.projects_dir, '/var/www/projects')
+    args.extend([
+        '--workdir', workdir,
+        ctx.devbox_image,
+        'runuser', '-u', 'devbox', '--'
+    ])
+    
     try:
-        args = common_args(ctx)
-        args.extend([
-            '--volume', f'{os.getcwd()}:/mnt',
-            '--workdir', '/mnt',
-        ])
-        args.append(ctx.devbox_image)
-        args.extend(['runuser', '-u', 'devbox', '--'])
         args.extend(resolve_shim(ctx))
-        return args
     except InvalidSchema as e:
         formatted_errors = pprint.pformat(e.errors)
         raise Error(
@@ -56,6 +61,8 @@ def other_command_args(ctx: Context) -> List[str]:
             f"\t{e.file_path}\n\n"
             f"{formatted_errors}"
         )
+
+    return args
 
 
 def common_args(ctx: Context) -> List[str]:
@@ -66,11 +73,14 @@ def common_args(ctx: Context) -> List[str]:
         '--interactive',
 
         '--volume', f'{ctx.repo_dir}/config.yml:/etc/devbox/config.yml:ro',
-        '--volume', f'{ctx.repo_dir}/shell:/var/www/shell',
 
         '--volume', f'devbox-sockets:/run/devbox-sockets',
         '--volume', f'{ctx.config.projects_volume}:/var/www/projects',
+        '--volume', f'{ctx.repo_dir}/shell:/var/www/shell',
         '--volume', f'{ctx.repo_dir}/volumes/devbox-home:/home/devbox',
+        '--volume', f'{ctx.repo_dir}/volumes/logs/apache2:/var/log/apache2',
+        '--volume', f'{ctx.repo_dir}/volumes/logs/mariadb:/var/log/mysql',
+        '--volume', f'{ctx.repo_dir}/volumes/logs/php:/var/log/php',
         '--volume', f'{ctx.repo_dir}/volumes/mariadb:/var/lib/mysql',
         '--volume', f'{ctx.repo_dir}/volumes/php-sessions:/var/lib/php/sessions',  # noqa: E501
 
@@ -97,7 +107,7 @@ def common_args(ctx: Context) -> List[str]:
         logging.debug("Mapping host SSH agent")
         args.extend([
             '--volume', f'{ssh_auth_sock}:/run/ssh-agent-host.sock',
-            '--env', f'SSH_AUTH_SOCK={ssh_auth_sock}',
+            '--env', f'SSH_AUTH_SOCK=/run/ssh-agent-host.sock',
         ])
 
     return args

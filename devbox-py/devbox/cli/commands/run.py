@@ -5,6 +5,7 @@ import pprint
 import sys
 
 from devbox.cli import Context, Error
+from devbox.cli.docker import ensure_devbox_network_exists
 from devbox.cli.shim import resolve_shim
 from devbox.cli.util import find_binary
 from devbox.schema import InvalidSchema
@@ -21,8 +22,9 @@ def call(ctx: Context) -> None:
     else:
         docker_args = other_command_args(ctx)
 
-    logging.debug(docker_args)
+    ensure_devbox_network_exists()
 
+    logging.debug(f"Running command: {pprint.pformat(docker_args)}")
     os.execv(find_binary('docker'), docker_args)
 
 
@@ -71,6 +73,8 @@ def common_args(ctx: Context) -> List[str]:
         'run',
         '--rm',
         '--interactive',
+
+        '--network', 'devbox',
 
         '--volume', f'{ctx.repo_dir}/config.yml:/etc/devbox/config.yml:ro',
 

@@ -1,0 +1,22 @@
+[[source]]
+url = "https://pypi.python.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[dev-packages]
+pycodestyle = "*"
+mypy = "*"
+types-pyyaml = "*"
+
+[requires]
+python_version = "3.9"
+
+[packages]
+cerberus = ">=1.3"
+inotify = ">=0.2"
+jinja2 = ">=2.10"
+pyyaml = ">=5.3"
+
+[scripts]
+check-types = "mypy ./devbox"
+check-style = "find ./devbox -type f -name '*.py' -exec pycodestyle {} \\;"

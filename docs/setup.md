@@ -1,6 +1,16 @@
 # Setup-Anleitung
 
-Die einzige aktuell unterstützte Setup-Methode ist das Setup per Repository.
+Die einzige aktuell unterstützte Setup-Methode ist das Setup per Repository auf
+einem Ubuntu-System (18.04 oder neuer).
+
+## Systemabhängigkeiten
+
+Damit das Devbox-Tooling laufen kann müssen bestimmte Systempakete installiert
+sein. Folgender Befehl installiert diese Pakete:
+
+```
+$ sudo apt install python3-cerberus python3-docker python3-yaml
+```
 
 ## Setup per Repository
 

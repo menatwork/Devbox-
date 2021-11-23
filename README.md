@@ -1,13 +1,17 @@
 # Devbox
 
-Devbox ist ein autarkes Entwicklungssystem auf Basis von [Docker][1]. Es fasst
-alles in einem Container zusammen, was zur Arbeit an PHP-Projekten notwendig
-ist: Apache, PHP, ein MariaDB-Server und ein Tool namens [Mailcatcher][2], mit
-dem Mailversand getestet werden kann.
+Autarkes Entwicklungssystem für PHP- und Node-Projekte
 
-* [Installation](doc/install.md)
+Devbox ist ein Entwicklungssystem auf Basis von [Docker][1]. Es fasst alles in
+einem Paket zusammen, was zur Arbeit an PHP-Projekten notwendig ist: Apache,
+PHP, ein MariaDB-Server und ein Tool namens [Mailcatcher][2], mit dem
+Mailversand getestet werden kann.
+
+## Dokumentation
+
+* [Setup](doc/setup.md)
 * [Changelog](doc/changelog.md)
-* [.devbox.yml](doc/schema.md)
+* [.devbox.yml](doc/schema-file.md)
 
 ## Versionen
 

@@ -16,6 +16,7 @@ project:
   type: craftcms3
   webroot: backend/web
   php: '7.3'
+
   resources:
     - web/assets
 

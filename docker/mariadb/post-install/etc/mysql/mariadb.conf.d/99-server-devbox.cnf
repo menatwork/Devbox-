@@ -1,0 +1,3 @@
+[mysqld]
+socket = /run/devbox-sockets/mariadb.sock
+bind-address = devbox-server.

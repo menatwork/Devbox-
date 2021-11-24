@@ -19,4 +19,4 @@ pyyaml = ">=5.3"
 
 [scripts]
 check-types = "mypy ./devbox"
-check-style = "find ./devbox -type f -name '*.py' -exec pycodestyle {} \\;"
+check-style = "sh -c 'find ./devbox -type f -name \\*.py | xargs pycodestyle'"

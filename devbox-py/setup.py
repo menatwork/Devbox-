@@ -9,8 +9,10 @@ setup(
     install_requires=[
         'cerberus>=1.3',
         'inotify>=0.2',
-        'jinja2>=2.10'
+        'jinja2>=2.10',
         'pyyaml>=5.3',
+        'toml>=0.10',
+        'Flask>=2.0',
     ],
     entry_points={
         'console_scripts': [

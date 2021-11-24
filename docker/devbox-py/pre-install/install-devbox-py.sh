@@ -1,10 +1,2 @@
-p=(
-  python3-cerberus
-  python3-docker
-  python3-jinja2
-  python3-pip
-  python3-yaml
-)
-
-build-helper install  "${p[@]}"
+build-helper install python3-pip
 pip3 install -e /src/devbox-py

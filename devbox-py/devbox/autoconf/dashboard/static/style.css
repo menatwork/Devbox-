@@ -64,9 +64,6 @@ a {
   white-space: nowrap;
 }
 
-.vhosts th:nth-child(3),
-.vhosts td:nth-child(3) { text-align: right; }
-
 .vhosts td:not(:last-child) {
   width: 0;
 }

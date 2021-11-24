@@ -1,8 +1,9 @@
 from sys import argv, stderr, exit
 import logging
 import os
+import threading
 
-from . import Autoconf
+from . import Autoconf, dashboard
 
 
 def main() -> None:
@@ -12,7 +13,10 @@ def main() -> None:
 
     logging.basicConfig(level=logging.INFO)
 
-    os.chdir('/etc/devbox')
+    os.chdir('/etc/devbox/host')
+
+    dashboard_thread = threading.Thread(target=dashboard.run_server)
+    dashboard_thread.start()
 
     a = Autoconf()
     a.watch_and_update_vhosts()

@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<link rel="stylesheet" href="//{{ hostname }}/static/style.css">
+<link rel="icon" type="image/png" href="//{{ hostname }}/static/img/favicon.png" sizes="32x32">
+<title>{% block title %}{% endblock %} • {{ hostname }}</title>
+
+<header class="page-header">
+  <h1 class="page-title">{{ hostname }}</h1>
+</header>
+
+<main class="page-main">
+  {% block content %}{% endblock %}
+</main>
+
+<footer class="page-footer">
+  <small>Remember to stay hydrated :)</small>
+</footer>

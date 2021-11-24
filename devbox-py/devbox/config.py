@@ -10,7 +10,6 @@ SPEC = {
         'type': 'dict',
         'schema': {
             'projects_root': {'type': 'string'},
-            'schema_file': {'type': 'string'},
         }
     },
 
@@ -48,7 +47,7 @@ class ConfigError(Exception):
 
 class Config(object):
     @staticmethod
-    def load(file_path: str = '/etc/devbox/config.yml') -> Config:
+    def load(file_path: str = '/etc/devbox/host/config.yml') -> Config:
         with open(file_path) as f:
             data = yaml.load(f, Loader=yaml.SafeLoader)
 

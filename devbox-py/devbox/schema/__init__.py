@@ -11,6 +11,8 @@ import cerberus  # type: ignore[import]
 
 from .rules import SCHEMA_FILE_RULES
 
+SCHEMA_FILE_NAME = '.devbox.yml'
+
 
 class SchemaError(Exception): pass
 

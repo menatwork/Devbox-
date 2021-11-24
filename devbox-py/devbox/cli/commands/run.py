@@ -77,11 +77,10 @@ def common_args(ctx: Context) -> List[str]:
         '--network', 'devbox',
 
         '--volume',
-        f'{ctx.repo_dir}/config/config.yml:/etc/devbox/config.yml:ro',
+        f'{ctx.repo_dir}/config:/etc/devbox/host:ro',
 
         '--volume', f'devbox-sockets:/run/devbox-sockets',
         '--volume', f'{ctx.config.projects_volume}:/var/www/projects',
-        '--volume', f'{ctx.repo_dir}/shell:/var/www/shell',
         '--volume', f'{ctx.repo_dir}/volumes/devbox-home:/home/devbox',
         '--volume', f'{ctx.repo_dir}/volumes/logs/apache2:/var/log/apache2',
         '--volume', f'{ctx.repo_dir}/volumes/logs/mariadb:/var/log/mysql',

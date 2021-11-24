@@ -1,11 +1,13 @@
+from typing import Dict
 import logging
 import os
 
 import jinja2
 
-from ..schema import Schema, SchemaError
+from ..schema import Schema, SchemaError, SCHEMA_FILE_NAME
 from ..config import Config
 from .watcher import SchemaFileWatcher
+from . import dashboard
 
 
 class Autoconf(object):
@@ -21,11 +23,11 @@ class Autoconf(object):
         `SchemaWatcher` and triggers VHost reconfigurations.
         """
         projects_root = self.cfg.require('general', 'projects_root')
-        schema_file = self.cfg.require('general', 'schema_file')
 
-        schemas_by_project_dir = {}
+        schemas_by_project_dir: Dict[str, Schema] = {}
+        dashboard.schemas_by_project_dir = schemas_by_project_dir
 
-        for event in SchemaFileWatcher(projects_root, schema_file):
+        for event in SchemaFileWatcher(projects_root, SCHEMA_FILE_NAME):
             if event.is_new_or_changed():
                 try:
                     schema_file_path = event.schema_file_path()
@@ -33,7 +35,7 @@ class Autoconf(object):
                     schema = Schema.load_file(schema_file_path)
                     schemas_by_project_dir[event.project_dir] = schema
 
-                    logging.info(f"{schema.project_name}: updating vhost config")
+                    logging.debug(f"{schema.project_name}: updating vhost config")
                     self.vhost_update(schema)
                 except SchemaError as e:
                     logging.error(f"{schema_file_path}: {e}")
@@ -44,7 +46,7 @@ class Autoconf(object):
             elif event.is_gone():
                 try:
                     schema = schemas_by_project_dir.pop(event.project_dir)
-                    logging.info(f"{schema.project_name}: dropping vhost config")
+                    logging.debug(f"{schema.project_name}: dropping vhost config")
                     self.vhost_drop(schema)
                 except KeyError:
                     # unrelated directory or file deletion
@@ -91,8 +93,7 @@ class Autoconf(object):
         except KeyError:
             raise SchemaError(f"PHP version unavailable: {wanted_version}")
 
-        vhost_template = self.cfg.require('autoconf', 'apache2', 'vhost_template')
-        with open(vhost_template) as f:
+        with open('templates/apache-vhost.conf.j2') as f:
             template = jinja2.Template(f.read())
         
         if not schema.project_directory:

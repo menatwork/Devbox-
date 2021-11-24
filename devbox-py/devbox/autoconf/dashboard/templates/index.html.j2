@@ -1,0 +1,30 @@
+{% extends "base.html.j2" %}
+
+{% block title %}Index{% endblock %}
+
+{% block content %}
+
+<table class="vhosts">
+  <tr>
+    <th></th>
+    <th>Projekt</th>
+    <th>Links</th>
+  </tr>
+  {% for project_dir, schema in schemas_by_project_dir.items() %}
+  {% set type = schema.project.type or 'unknown' %}
+  {% set project_hostname = schema.project_name + '.' + hostname %}
+  <tr>
+    <td>
+      <img class="project-icon" src="/static/img/icon-{{ type }}.png" alt="{{ type }}">
+    </td>
+
+    <td>
+      <a href="//{{ project_hostname }}">{{ schema.project_name }}</a>
+    </td>
+
+    <td class="project-links">{% include 'links/' + type + '.html.j2' ignore missing %}</td>
+  </tr>
+  {% endfor %}
+</table>
+
+{% endblock %}

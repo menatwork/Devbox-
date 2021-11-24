@@ -1,6 +1,5 @@
 general:
   projects_root: /var/www/projects
-  schema_file: .devbox.yml
 
 php:
   default_version: "7.4"
@@ -20,6 +19,5 @@ php:
 
 autoconf:
   apache2:
-    vhost_template: apache-vhost.conf.j2
     vhost_directory: /run/apache2/devbox-vhosts
     reload_command: apachectl -k graceful

@@ -1,17 +1,15 @@
-"""
-Devbox schema files (.devbox.yml)
-"""
 from dataclasses import dataclass
-from typing import Optional
+from typing import MutableMapping, Optional
 import os
-import pprint
-import yaml
+import json
+import toml
 
 import cerberus  # type: ignore[import]
 
 from .rules import SCHEMA_FILE_RULES
 
-SCHEMA_FILE_NAME = '.devbox.yml'
+
+SCHEMA_FILE_NAME = '.devbox.toml'
 
 
 class SchemaError(Exception): pass
@@ -30,7 +28,7 @@ class InvalidSchema(SchemaError):
         self.file_path = file_path
 
     def __str__(self) -> str:
-        pretty_errors = pprint.pformat(self.errors)
+        pretty_errors = json.dumps(self.errors, indent=2)
         return f"{self.file_path}: invalid schema: {pretty_errors}"
 
 
@@ -51,8 +49,8 @@ class Project(object):
 
 @dataclass
 class InstanceSecureShell(object):
-    host: str
     user: str
+    host: str
 
 
 @dataclass
@@ -67,7 +65,10 @@ class Instance(object):
 
     def __init__(self, data: dict) -> None:
         super().__init__()
-        self.ssh = InstanceSecureShell(**data['ssh'])
+
+        ssh_user, ssh_host = data['ssh'].split('@', maxsplit=1)
+        self.ssh = InstanceSecureShell(user=ssh_user, host=ssh_host)
+
         self.deployment = InstanceDeployment(**data['deployment'])
 
 
@@ -80,9 +81,8 @@ class Schema(object):
         May raise `InvalidSchema` or `SchemaNotFound`.
         """
         try:
-            with open(file_path) as f:
-                data = yaml.load(f, Loader=yaml.SafeLoader)
-        except yaml.YAMLError as e:
+            data = toml.load(file_path)
+        except toml.TomlDecodeError as e:
             raise SchemaError(f"Couldn't parse schema file {file_path}: {e}")
 
         return Schema(data, file_path)
@@ -104,7 +104,7 @@ class Schema(object):
             raise ValueError(f"boundary ({boundary}) is outside of cwd ({d})")
 
         while d.startswith(boundary):
-            schema_file = os.path.join(d, '.devbox.yml')
+            schema_file = os.path.join(d, SCHEMA_FILE_NAME)
 
             if os.path.isfile(schema_file) or os.path.islink(schema_file):
                 return Schema.load_file(schema_file)
@@ -126,7 +126,7 @@ class Schema(object):
     project: Project
     instances: Optional['dict[str, Instance]']
 
-    def __init__(self, data: dict, file_path: Optional[str] = None) -> None:
+    def __init__(self, data: MutableMapping, file_path: Optional[str] = None) -> None:
         super().__init__()
 
         self.validate(data, file_path)
@@ -134,7 +134,7 @@ class Schema(object):
         self.init_metadata(file_path)
         self.init_schema_fields(data)
 
-    def validate(self, data: dict, file_path: Optional[str] = None) -> None:
+    def validate(self, data: MutableMapping, file_path: Optional[str] = None) -> None:
         v = cerberus.Validator(allow_unknown=True)
         v.validate(data, SCHEMA_FILE_RULES)
         if v.errors:
@@ -150,7 +150,7 @@ class Schema(object):
             self.project_directory = pd
             self.project_name = pn
 
-    def init_schema_fields(self, data: dict) -> None:
+    def init_schema_fields(self, data: MutableMapping) -> None:
         self.version = data['version']
 
         self.project = Project(**data['project'])

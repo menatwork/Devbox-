@@ -11,7 +11,7 @@ Mailversand getestet werden kann.
 
 * [Setup](doc/setup.md)
 * [Changelog](doc/changelog.md)
-* [.devbox.yml](doc/schema-file.md)
+* [.devbox.toml](doc/schema-file.md)
 
 ## Versionen
 

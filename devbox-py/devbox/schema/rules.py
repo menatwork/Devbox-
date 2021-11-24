@@ -26,18 +26,9 @@ PROJECT_FIELD_RULES = {
 
 INSTANCE_VALUE_RULES = {
     'ssh': {
-        'type': 'dict',
-        'schema': {
-            'host': {
-                'type': 'string',
-                'required': True,
-            },
-
-            'user': {
-                'type': 'string',
-                'required': True,
-            },
-        },
+        'type': 'string',
+        'required': True,
+        'regex': '.+@.+',
     },
 
     'deployment': {

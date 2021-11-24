@@ -1,49 +1,36 @@
-# Schemadatei (`.devbox.yml`)
+# Schemadatei (`.devbox.toml`)
 
 Interne Projekte müssen zur Integration im Devbox-System mit einer
-Projektschemadatei namens `.devbox.yml` ausgestattet sein. In dieser Schemadatei
-werden Eigenschaften des Projektes definiert, die zur Automatisierung
-verschiedener Prozesse erforderlich sind.
+Projektschemadatei namens `.devbox.toml` ausgestattet sein. In dieser
+Schemadatei werden Eigenschaften des Projektes definiert, die zur
+Automatisierung verschiedener Prozesse erforderlich sind.
 
 \[\[_TOC_\]\]
 
 ## Beispiel
 
-```yaml
-version: '1'
+```toml
+version = "1"
 
-project:
-  type: craftcms3
-  webroot: backend/web
-  php: '7.3'
+[project]
+type = "contao4"
+webroot = "web"
+php = "7.4"
 
-  resources:
-    - web/assets
+resources = [
+  "data",
+  "files/content",
+  "system/config/localconfig.php",
+  "system/config/tcpdf.php",
+]
 
-instances:
-  production:
-    ssh:
-      host: vsa-wiboxu.cyon.net
-      user: riposach
-    deployment:
-      method: deployer
-      dir: ~/public_html/production.riposa.ch
+[instances.live]
+ssh = "user@liveserver.example.com"
+deployment = { method = "manual", dir = "html" }
 
-  staging:
-    ssh:
-      host: vsa-wiboxu.cyon.net
-      user: riposach
-    deployment:
-      method: deployer
-      dir: ~/public_html/staging.riposa.ch
-
-  develop:
-    ssh:
-      host: vsa-wiboxu.cyon.net
-      user: riposach
-    deployment:
-      method: deployer
-      dir: ~/public_html/develop.riposa.ch
+[instances.dev]
+ssh = "user@devserver.example.com"
+deployment = { method = "manual", dir = "html" }
 ```
 
 ## Felder
@@ -98,13 +85,9 @@ Seiteninstanz zu beziehen.
 
 Instanzen dieses Projektes auf Remote-Servern.
 
-#### `instances.<name>.ssh.host` `*`
+#### `instances.<name>.ssh` `*`
 
-Hostname, unter dem die Instanz per SSH erreichbar ist.
-
-#### `instances.<name>.ssh.user` `*`
-
-Benutzername für das SSH-Login.
+User und Hostname, unter dem die Instanz per SSH erreichbar ist.
 
 #### `instances.<name>.deployment.type` `*`
 

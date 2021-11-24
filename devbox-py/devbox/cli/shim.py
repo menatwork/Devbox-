@@ -64,7 +64,7 @@ def select_php_binary(rc: ResolverContext) -> str:
             )
             return default_version
 
-    config_file = os.path.join(rc.repo_dir, 'config.yml')
+    config_file = os.path.join(rc.repo_dir, 'config', 'config.yml')
     config = DevboxConfig.load(config_file)
 
     try:

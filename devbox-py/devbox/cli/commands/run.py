@@ -76,7 +76,8 @@ def common_args(ctx: Context) -> List[str]:
 
         '--network', 'devbox',
 
-        '--volume', f'{ctx.repo_dir}/config.yml:/etc/devbox/config.yml:ro',
+        '--volume',
+        f'{ctx.repo_dir}/config/config.yml:/etc/devbox/config.yml:ro',
 
         '--volume', f'devbox-sockets:/run/devbox-sockets',
         '--volume', f'{ctx.config.projects_volume}:/var/www/projects',

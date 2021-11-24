@@ -2,7 +2,7 @@ from sys import argv, stderr, exit
 import logging
 import os
 
-from .autoconf import Autoconf
+from . import Autoconf
 
 
 def main() -> None:

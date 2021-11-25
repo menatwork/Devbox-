@@ -22,10 +22,6 @@ def resolve_shim(ctx: Context) -> List[str]:
         'composer': resolve_composer,
         'composer1': resolve_composer,
         'php': resolve_php,
-        'php5.6': resolve_php,
-        'php7.3': resolve_php,
-        'php7.4': resolve_php,
-        'php8.0': resolve_php,
     }
 
     shim_name = os.path.basename(ctx.args[0])

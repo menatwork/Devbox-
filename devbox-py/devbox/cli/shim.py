@@ -13,7 +13,7 @@ class ResolverContext(Context):
 
     def __init__(self, ctx: Context):
         super().__init__(
-            ctx.args, ctx.config, ctx.repo_dir, ctx.devbox_image
+            ctx.args, ctx.config, ctx.repo_dir
         )
 
 
@@ -53,18 +53,18 @@ def select_php_binary(rc: ResolverContext) -> str:
         if schema and schema.project.php:
             return schema.project.php
         else:
-            default_version = config.require('php', 'default_version')
+            default_version = config.php.default_version
             logging.warning(
                 f"Default-PHP-Version ({default_version}) wird verwendet: "
                 f"{warning_text}"
             )
             return default_version
 
-    config_file = os.path.join(rc.repo_dir, 'config', 'config.yml')
-    config = DevboxConfig.load(config_file)
+    config_dir = os.path.join(rc.repo_dir, 'config')
+    config = DevboxConfig.load_dir(config_dir)
 
     try:
-        schema = Schema.find_and_load('/')
+        schema = Schema.find_and_load('/', config.general.schema_file_name)
         version_key = get_version_key(
             config, schema, "Schema definiert keine PHP-Version"
         )
@@ -72,5 +72,5 @@ def select_php_binary(rc: ResolverContext) -> str:
         version_key = get_version_key(
             config, None, "keine Schemadatei gefunden"
         )
-
-    return config.require('php', 'versions', version_key, 'binary')
+    
+    return config.php.versions[version_key].binary

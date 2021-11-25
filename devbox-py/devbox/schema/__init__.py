@@ -9,9 +9,6 @@ import cerberus  # type: ignore[import]
 from .rules import SCHEMA_FILE_RULES
 
 
-SCHEMA_FILE_NAME = '.devbox.toml'
-
-
 class SchemaError(Exception): pass
 
 
@@ -88,7 +85,7 @@ class Schema(object):
         return Schema(data, file_path)
 
     @staticmethod
-    def find_and_load(boundary: str) -> 'Schema':
+    def find_and_load(boundary: str, schema_file_name: str) -> 'Schema':
         """
         Automatically find and load a schema file
 
@@ -104,7 +101,7 @@ class Schema(object):
             raise ValueError(f"boundary ({boundary}) is outside of cwd ({d})")
 
         while d.startswith(boundary):
-            schema_file = os.path.join(d, SCHEMA_FILE_NAME)
+            schema_file = os.path.join(d, schema_file_name)
 
             if os.path.isfile(schema_file) or os.path.islink(schema_file):
                 return Schema.load_file(schema_file)

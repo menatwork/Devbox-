@@ -31,26 +31,37 @@ def call(ctx: Context) -> None:
 def server_args(ctx: Context) -> List[str]:
     args = common_args(ctx)
     args.extend([
-        '--name', 'devbox-server',
+        '--name', ctx.config.docker.server_container,
         '--publish', '80:80',
         '--publish', '3306:3306',
-        ctx.devbox_image,
+        ctx.config.docker.server_image,
         '/server.sh',
     ])
     return args
 
 
 def other_command_args(ctx: Context) -> List[str]:
+    projects_root = ctx.config.general.projects_root
     host_workdir = os.getcwd()
-    if not host_workdir.startswith(ctx.config.projects_dir):
-        raise Error("Nicht im Projektverzeichnis")
+
+    if not host_workdir.startswith(projects_root):
+        raise Error(
+            "Nicht im Projektverzeichnis"
+            "\n"
+            "`devbox run` und von Devbox bereitgestellte Programme können nur "
+            f"in {projects_root} ausgeführt werden."
+        )
 
     args = common_args(ctx)
 
-    workdir = host_workdir.replace(ctx.config.projects_dir, '/var/www/projects')
+    workdir = host_workdir.replace(
+        projects_root,
+        ctx.config.general.projects_root_internal
+    )
+
     args.extend([
         '--workdir', workdir,
-        ctx.devbox_image,
+        ctx.config.docker.server_image,
         'runuser', '-u', 'devbox', '--'
     ])
     
@@ -68,6 +79,9 @@ def other_command_args(ctx: Context) -> List[str]:
 
 
 def common_args(ctx: Context) -> List[str]:
+    projects_root = ctx.config.general.projects_root
+    projects_root_internal = ctx.config.general.projects_root_internal
+
     args = [
         'docker',
         'run',
@@ -80,7 +94,7 @@ def common_args(ctx: Context) -> List[str]:
         f'{ctx.repo_dir}/config:/etc/devbox/host:ro',
 
         '--volume', f'devbox-sockets:/run/devbox-sockets',
-        '--volume', f'{ctx.config.projects_volume}:/var/www/projects',
+        '--volume', f'{projects_root}:{projects_root_internal}',
         '--volume', f'{ctx.repo_dir}/volumes/devbox-home:/home/devbox',
         '--volume', f'{ctx.repo_dir}/volumes/logs/apache2:/var/log/apache2',
         '--volume', f'{ctx.repo_dir}/volumes/logs/mariadb:/var/log/mysql',
@@ -92,7 +106,11 @@ def common_args(ctx: Context) -> List[str]:
         '--env', f'DEVBOX_GID={os.getgid()}',
     ]
 
-    if ctx.config.debug:
+    if sys.stdin.isatty():
+        logging.debug('TTY detected, passing --tty')
+        args.append('--tty')
+
+    if ctx.config.cli.debug:
         logging.debug('Debug mode is on, mapping devbox-py')
         args.extend([
             '--volume',
@@ -102,10 +120,6 @@ def common_args(ctx: Context) -> List[str]:
     if os.path.exists('/etc/localtime'):
         logging.debug("Mapping host timezone")
         args.extend(['--volume', '/etc/localtime:/etc/localtime:ro'])
-
-    if sys.stdin.isatty():
-        logging.debug('TTY detected, passing --tty')
-        args.append('--tty')
 
     if ssh_auth_sock := os.getenv('SSH_AUTH_SOCK'):
         logging.debug("Mapping host SSH agent")

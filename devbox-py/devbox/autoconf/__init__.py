@@ -4,30 +4,30 @@ import os
 
 import jinja2
 
-from ..schema import Schema, SchemaError, SCHEMA_FILE_NAME
+import devbox.config
+from ..schema import Schema, SchemaError
 from ..config import Config
 from .watcher import SchemaFileWatcher
 from . import dashboard
 
 
 class Autoconf(object):
+    config: Config
+
     """
     Main application object
     """
-    def __init__(self) -> None:
-        self.cfg = Config.load()
+    def __init__(self, config: Config) -> None:
+        self.cfg = config
 
     def watch_and_update_vhosts(self) -> None:
-        """
-        The daemon's main loop, which ingests schema file events from
-        `SchemaWatcher` and triggers VHost reconfigurations.
-        """
-        projects_root = self.cfg.require('general', 'projects_root')
+        dir = self.cfg.general.projects_root_internal
+        schema_file_name = self.cfg.general.schema_file_name
 
         schemas_by_project_dir: Dict[str, Schema] = {}
         dashboard.schemas_by_project_dir = schemas_by_project_dir
 
-        for event in SchemaFileWatcher(projects_root, SCHEMA_FILE_NAME):
+        for event in SchemaFileWatcher(dir, schema_file_name):
             if event.is_new_or_changed():
                 try:
                     schema_file_path = event.schema_file_path()
@@ -81,15 +81,16 @@ class Autoconf(object):
         self.reload_apache2()
 
     def reload_apache2(self) -> None:
-        cmd = self.cfg.require('autoconf', 'apache2', 'reload_command')
+        cmd = self.cfg.autoconf.reload_command
         r = os.system(cmd)
         if r != 0:
             logging.error(f"command returned {r}: {cmd}")
 
     def render_apache2_vhost_config(self, schema: Schema) -> str:
+        wanted_version = schema.project.php or self.cfg.php.default_version
+
         try:
-            wanted_version = schema.project.php or self.cfg.require('php', 'default_version')
-            php_socket = self.cfg.require('php', 'versions', wanted_version, 'socket')
+            php_socket = self.cfg.php.versions[wanted_version].socket
         except KeyError:
             raise SchemaError(f"PHP version unavailable: {wanted_version}")
 
@@ -109,5 +110,7 @@ class Autoconf(object):
         )
 
     def get_apache2_vhost_path(self, schema: Schema) -> str:
-        dir = self.cfg.require('autoconf', 'apache2', 'vhost_directory')
-        return os.path.join(dir, f'{schema.project_name}.conf')
+        return os.path.join(
+            self.cfg.autoconf.vhost_directory,
+            f'{schema.project_name}.conf'
+        )

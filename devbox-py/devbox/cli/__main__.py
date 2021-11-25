@@ -4,7 +4,7 @@ import os
 import sys
 
 from . import commands, Error, Context
-from .config import load_dotenv_config, ConfigError
+from ..config import Config
 import devbox.logging
 
 
@@ -13,11 +13,9 @@ def main() -> None:
 
     args = sys.argv[1:]  # skip program name
     repo_dir = os.path.normpath(os.environ['DEVBOX_CLI_REPO_DIR'])
+    config_dir = os.path.join(repo_dir, 'config')
 
-    try:
-        config = load_dotenv_config(os.path.join(repo_dir, '.env'))
-    except ConfigError:
-        fail(".env konnte nicht geladen werden")
+    config = Config.load_dir(config_dir)
 
     ctx = Context(
         args=args,

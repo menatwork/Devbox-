@@ -1,0 +1,47 @@
+# This file defines default values for Devbox's configuration.
+#
+# You should not edit this file unless you're making changes to the Devbox
+# system. For customization of your local setup, create `config/local.toml` and
+# override specific options from this file there.
+
+[general]
+projects_root = "projects"
+projects_root_internal = "/var/www/projects"
+
+hostname = "devbox.localhost"
+
+schema_file_name = ".devbox.toml"
+
+[docker]
+server_image = "gitlab.men-at-work.de:4774/entwicklung/devbox"
+server_container = "devbox-server"
+
+base_image = "ubuntu:focal"
+
+default_build_tag = "latest"
+
+[autoconf]
+vhost_directory = "/run/apache2/devbox-vhosts"
+reload_command = "apachectl -k graceful"
+
+[cli]
+debug = false
+
+[php]
+default_version = "7.4"
+
+[php.versions."8.0"]
+socket = "/run/php/php8.0-fpm.sock"
+binary = "/usr/bin/php8.0"
+
+[php.versions."7.4"]
+socket = "/run/php/php7.4-fpm.sock"
+binary = "/usr/bin/php7.4"
+
+[php.versions."7.3"]
+socket = "/run/php/php7.3-fpm.sock"
+binary = "/usr/bin/php7.3"
+
+[php.versions."5.6"]
+socket = "/run/php/php5.6-fpm.sock"
+binary = "/usr/bin/php5.6"

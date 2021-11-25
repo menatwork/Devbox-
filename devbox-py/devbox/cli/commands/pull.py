@@ -14,7 +14,9 @@ def call(ctx: Context) -> None:
     if len(ctx.args) != 0:
         raise UsageError("Zu viele Parameter")
 
+    server_image = ctx.config.docker.server_image
+
     try:
-        cmd('docker', 'image', 'pull', ctx.devbox_image)
+        cmd('docker', 'image', 'pull', server_image)
     except subprocess.CalledProcessError:
         raise Error("Befehl konnte nicht ausgeführt werden")

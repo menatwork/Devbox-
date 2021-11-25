@@ -1,8 +1,8 @@
 import os
 
 from . import UsageError
-from devbox.cli import Context, Error
-from devbox.cli.util import cmd
+from .. import Context, Error
+from ..util import cmd
 
 
 name = 'browser'
@@ -15,11 +15,13 @@ def call(ctx: Context) -> None:
         raise UsageError("Zu viele Parameter")
 
     cwd = os.getcwd()
-    projects_dir = os.path.normpath(ctx.config.projects_dir)
-    relative_dir = os.path.relpath(cwd, projects_dir)
+    projects_root = ctx.config.general.projects_root
+    relative_dir = os.path.relpath(cwd, projects_root)
 
     if relative_dir == '.' or relative_dir.startswith('../'):
         raise Error(f"{cwd} ist kein Projektverzeichnis")
 
     relative_project_dir = relative_dir.split(os.sep)[0]
-    cmd('xdg-open', f'http://{relative_project_dir}.devbox.localhost')
+    url = f'http://{relative_project_dir}.{ctx.config.general.hostname}'
+
+    cmd('xdg-open', url)

@@ -15,8 +15,9 @@ def call(ctx: Context) -> None:
     # just in case we're not in the devbox repo
     os.chdir(ctx.repo_dir)
 
-    base_image = 'ubuntu:focal'
-    build_tag = 'latest'
+    server_image = ctx.config.docker.server_image
+    base_image = ctx.config.docker.base_image
+    build_tag = ctx.config.docker.default_build_tag
 
     if len(ctx.args) == 0:
         logging.info(
@@ -41,7 +42,7 @@ def call(ctx: Context) -> None:
     logging.info(f"Basis-Image wird aktualisiert: {base_image}")
     cmd('docker', 'pull', base_image)
 
-    full_tag = f'{ctx.devbox_image}:{build_tag}'
+    full_tag = f'{server_image}:{build_tag}'
     logging.info("Baue Image...")
     cmd(
         'docker', 'build',

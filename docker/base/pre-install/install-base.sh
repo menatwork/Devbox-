@@ -1,3 +1,5 @@
+mkdir /run/devbox
+
 p=(
   git
   htop

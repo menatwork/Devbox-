@@ -42,13 +42,13 @@ def call(ctx: Context) -> None:
     logging.info(f"Basis-Image wird aktualisiert: {base_image}")
     cmd('docker', 'pull', base_image)
 
-    full_tag = f'{server_image}:{build_tag}'
     logging.info("Baue Image...")
     cmd(
         'docker', 'build',
-        '--build-arg', f'DEVBOX_BASE_IMAGE={base_image}',
-        '--build-arg', f'DEVBOX_VERSION={version}',
-        '--tag', full_tag,
+        '--network=host',
+        f'--build-arg=DEVBOX_BASE_IMAGE={base_image}',
+        f'--build-arg=DEVBOX_VERSION={version}',
+        f'--tag={server_image}:{build_tag}',
         '.'
     )
 

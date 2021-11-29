@@ -1,11 +1,12 @@
 :root {
-  --color-fg         : #111;
-  --color-bg	     : #fff;
-  --color-bg2	     : #f7f7f7;
-  --color-border     : #000;
+  --color-fg: #f7f7f7;
+  --color-fg-soft: #6c6c6c;
+  --color-bg: #2c2c2c;
+  --color-bg-row-alternate: #363636;
+  --color-bg-bar: #1c1c1c;
 
-  --font-size-big    : 18pt;
-  --font-size-normal : 10pt;
+  --font-size-big: 14pt;
+  --font-size-normal: 10pt;
 }
 
 body {
@@ -18,7 +19,7 @@ body {
 body, code {
   display: flex;
   flex-flow: column;
-  font-family: Iosevka, monospace;
+  font-family: sans-serif;
 }
 
 body, h1 {
@@ -29,27 +30,59 @@ a {
   color: var(--color-fg);
 }
 
-.page-header, .page-footer {
+.dashboard-bar {
+  background: var(--color-bg-bar);
+  padding: .8em 1.3em;
+}
+
+.dashboard-bar,
+.dashboard-bar a
+{
   color: #fff;
-  background: #111;
-  padding: .5em 1.1em;
 }
 
-.page-footer {
+.dashboard-bar a {
+  text-decoration: none;
 }
 
-.page-main {
+.dashboard-bar a:hover {
+  text-decoration: underline;
+}
+
+.dashboard-nav {
+  display: flex;
+  align-items: center;
+}
+
+.dashboard-nav-list {
+  list-style: none;
+  padding: 0 1em;
+  margin: 0;
+}
+
+.dashboard-nav-list li {
+  display: inline-block;
+  margin: 0 0.3em;
+}
+
+.dashboard-header {
+  display: flex;
+}
+
+.dashboard-main {
   flex-grow: 1;
+}
+
+.dashboard-content {
   padding: 1em;
 }
 
-.page-title {
+.dashboard-title {
   font-size: var(--font-size-big);
   font-weight: 700;
 }
 
 .vhosts {
-  margin: .5em 0;
   width: 100%;
   border-collapse: collapse;
   font-size: var(--font-size-normal);
@@ -57,7 +90,8 @@ a {
 
 .vhosts th {
   font-size: var(--font-size-normal);
-  border-bottom: 1px solid var(--color-border);
+  color: var(--color-fg-soft);
+  border-bottom: 1px solid var(--color-fg-soft);
 }
 
 .vhosts td {
@@ -69,7 +103,7 @@ a {
 }
 
 .vhosts tr:nth-child(odd) td {
-  background: var(--color-bg2);
+  background: var(--color-bg-row-alternate);
 }
 
 .vhosts td, .vhosts th {
@@ -83,4 +117,11 @@ a {
 
 .project-links a:not(:first-child) {
   margin-left: .3em;
+}
+
+.mailcatcher-iframe {
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  border: none;
 }

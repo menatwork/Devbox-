@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<link rel="stylesheet" href="{{ base_url }}/static/style.css">
+<link rel="icon" type="image/png" href="{{ base_url }}/static/img/favicon.png" sizes="32x32">
+<title>{% block title %}{% endblock %} • {{ hostname }}</title>
+
+<header class="dashboard-bar dashboard-header">
+
+  <nav class="dashboard-nav">
+
+    <h1 class="dashboard-title">
+      <a href="{{ base_url }}">{{ hostname }}</a>
+    </h1>
+
+    <ul class="dashboard-nav-list">
+      <li><a href="{{ base_url }}">Projekte</a></li>
+      <li><a href="{{ base_url }}/mailcatcher">MailCatcher</a></li>
+    </ul>
+
+  </nav>
+
+</header>
+
+<main class="dashboard-main">
+  {% block content %}{% endblock %}
+</main>

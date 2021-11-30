@@ -8,9 +8,11 @@
 
 ### Allgemeines
 
-* Die [PHP-Version][0.3.0-php-version] von Projekten kann nun dynamisch in der `.devbox.yml` konfiguriert werden
+* Das Format der Schema- und Config-Dateien wurde auf Toml geändert
+* Die PHP-Version von Projekten kann nun dynamisch in der `.devbox.toml` konfiguriert werden
 * Diverse Tools aus der Devbox werden nun im Hostsystem verfügbar gemacht (siehe `bin/shims`)
 * Die Shell-Integration wird nun durch das Devbox-CLI gesteuert
+* Das Dashboard wurde erneuert
 * Der interne Webserver leitet von unbekannten Seiten nun auf das Dashboard bzw. eine 404-Seite um
 
 ### PHP
@@ -46,5 +48,3 @@
 ## 0.1.0 (4. Februar 2020)
 
 * erstes Release
-
-[0.3.0-php-version]: https://gitlab.men-at-work.de/entwicklung/devbox/-/wikis/.devbox.yml#projectphp

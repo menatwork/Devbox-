@@ -3,13 +3,16 @@
 Die einzige aktuell unterstützte Setup-Methode ist das Setup per Repository auf
 einem Ubuntu-System (18.04 oder neuer).
 
-## Systemabhängigkeiten
+Devbox ist theoretisch auch unter Windows in [WSL2][wsl2] lauffähig. Hier sind
+aber zusätzliche Schritte notwendig, die noch nicht dokumentiert sind.
 
-Damit das Devbox-Tooling laufen kann müssen bestimmte Systempakete installiert
+## Abhängigkeiten
+
+Damit das Devbox-Tooling funktioniert müssen bestimmte Systempakete installiert
 sein. Folgender Befehl installiert diese Pakete:
 
 ```
-$ sudo apt install python3-cerberus python3-docker python3-yaml
+$ sudo apt install python3-cerberus python3-docker python3-toml xdg-utils
 ```
 
 ## Setup per Repository
@@ -20,23 +23,21 @@ Klone dir zuerst das Devbox-Repo in einen Ordner deiner Wahl:
 $ git clone git@gitlab.men-at-work.de:entwicklung/devbox.git
 ```
 
-Als nächstes musst du dir einen Ordner aussuchen, in dem die Projekte liegen,
-an denen du mit Devbox arbeitest. Falls du noch keinen Ordner dafür hast kannst
-du per `mkdir` einen erstellen, z.B.: `mkdir ~/sites`
+Als nächstes musst du dir einen Ordner aussuchen, in dem die Projekte liegen
+werden, an denen du mit Devbox arbeitest. Falls du noch keinen Ordner dafür hast
+kannst du per `mkdir` einen erstellen, z.B.: `mkdir ~/sites`
 
-Kopiere dir jetzt im Devbox-Repository die `.env.sample`-Datei nach `.env`
-und setz darin die Variable `DEVBOX_PROJECTS_DIR` auf das Verzeichnis, das du
-für deine Projekte benutzen willst. Das könnte zum Beispiel so aussehen:
+Lege jetzt im Devbox-Repository die Datei `config/local.toml` mit folgendem
+Inhalt an (`~/sites` ersetzt du natürlich mit deinem Projektordner):
 
-```
-$ cd devbox
-$ cp .env.sample .env
-$ nano .env
+```toml
+[general]
+projects_root = ~/sites
 ```
 
 Als letztes solltest du noch den `devbox`-Befehl in deiner `PATH`-Variable
-installieren, damit du egal aus welchem Ordner heraus `devbox` aufrufen kannst.
-Das machst du, indem du in der Datei `~/.bashrc` diese Zeile am Ende anfügst:
+installieren, damit du egal in welchem Ordner du bist `devbox` aufrufen kannst.
+Dafür fügst du am Ende deiner `~/.bashrc` diese Zeile an:
 
 ```
 eval $(<pfad_zum_devbox_repository>/bin/devbox shell-init)
@@ -60,5 +61,3 @@ werden.
 Happy hacking!
 
 [wsl2]: https://docs.microsoft.com/de-de/windows/wsl/
-[1]: https://www.docker.com/products/docker-desktop
-[2]: https://gitforwindows.org/

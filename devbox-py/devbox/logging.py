@@ -3,6 +3,9 @@ import os
 import sys
 
 
+from .config import Config
+
+
 LEVEL_COLORS = {
     logging.CRITICAL: '\x1b[31m',
     logging.ERROR: '\x1b[31m',
@@ -40,10 +43,19 @@ class CliFormatter(logging.Formatter):
         return COLOR_RESET
 
 
-def init() -> None:
+def init(config: Config) -> None:
     use_colors = 'NO_COLOR' not in os.environ
 
     handler = logging.StreamHandler(stream=sys.stderr)
     handler.setFormatter(CliFormatter(use_colors))
 
-    logging.basicConfig(level=logging.DEBUG, handlers=[handler])
+    # some of the libraries we use emit log records too which we dont
+    # necessarily care about, so we'll filter them by default
+    handler.addFilter(lambda record: record.name == 'root')
+
+    if config.cli.debug:
+        level = logging.DEBUG
+    else:
+        level = logging.WARNING
+
+    logging.basicConfig(level=level, handlers=[handler])

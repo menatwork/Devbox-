@@ -9,13 +9,13 @@ import devbox.logging
 
 
 def main() -> None:
-    devbox.logging.init()
-
     args = sys.argv[1:]  # skip program name
     repo_dir = os.path.normpath(os.environ['DEVBOX_CLI_REPO_DIR'])
     config_dir = os.path.join(repo_dir, 'config')
 
     config = Config.load_dir(config_dir)
+
+    devbox.logging.init(config)
 
     ctx = Context(
         args=args,

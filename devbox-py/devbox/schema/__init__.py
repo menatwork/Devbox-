@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import MutableMapping, Optional
+from typing import Dict, MutableMapping, Optional
 import os
 import json
 import toml
@@ -121,7 +121,7 @@ class Schema(object):
     # schema fields
     version: str
     project: Project
-    instances: Optional['dict[str, Instance]']
+    instances: Dict[str, Instance] = {}
 
     def __init__(self, data: MutableMapping, file_path: Optional[str] = None) -> None:
         super().__init__()
@@ -153,6 +153,5 @@ class Schema(object):
         self.project = Project(**data['project'])
 
         if instances := data.get('instances'):
-            self.instances = {}
             for (name, inst) in instances.items():
                 self.instances[name] = Instance(inst)

@@ -19,24 +19,70 @@ long_help = "TODO"
 def call(ctx: Context) -> None:
     if len(ctx.args) == 0:
         docker_args = server_args(ctx)
+        ensure_devbox_network_exists()
     else:
         docker_args = other_command_args(ctx)
 
-    ensure_devbox_network_exists()
+    if ctx.config.cli.debug:
+        args_pretty = pprint.pformat(docker_args)
+        logging.debug(f"Running command:\n{args_pretty}")
 
-    logging.debug(f"Running command: {pprint.pformat(docker_args)}")
     os.execv(find_binary('docker'), docker_args)
 
 
 def server_args(ctx: Context) -> List[str]:
-    args = common_args(ctx)
+    projects_root = ctx.config.general.projects_root
+    projects_root_internal = ctx.config.general.projects_root_internal
+
+    args = [
+        'docker',
+        'run',
+        f'--name={ctx.config.docker.server_container}',
+        '--rm',
+        '--interactive',
+
+        '--network=devbox',
+        '--publish=80:80',
+        '--publish=3306:3306',
+
+        f'--volume={ctx.repo_dir}/config:/etc/devbox/host:ro',
+
+        f'--volume={projects_root}:{projects_root_internal}',
+        f'--volume={ctx.repo_dir}/volumes/devbox-home:/home/devbox',
+        f'--volume={ctx.repo_dir}/volumes/logs/apache2:/var/log/apache2',
+        f'--volume={ctx.repo_dir}/volumes/logs/mariadb:/var/log/mysql',
+        f'--volume={ctx.repo_dir}/volumes/logs/php:/var/log/php',
+        f'--volume={ctx.repo_dir}/volumes/mariadb:/var/lib/mysql',
+        f'--volume={ctx.repo_dir}/volumes/php-sessions:/var/lib/php/sessions',  # noqa: E501
+
+        f'--env=DEVBOX_UID={os.getuid()}',
+        f'--env=DEVBOX_GID={os.getgid()}',
+    ]
+
+    if sys.stdin.isatty():
+        logging.debug("TTY detected, passing --tty")
+        args.append('--tty')
+
+    if ctx.config.cli.debug:
+        logging.debug("Debug mode is on, mapping devbox-py")
+        args.append(f'--volume={ctx.repo_dir}/devbox-py/devbox:/src/devbox-py/devbox:ro')
+
+    if os.path.exists('/etc/localtime'):
+        logging.debug("Mapping host timezone")
+        args.append('--volume=/etc/localtime:/etc/localtime:ro')
+
+    if ssh_auth_sock := os.getenv('SSH_AUTH_SOCK'):
+        logging.debug("Mapping host SSH agent")
+        args.extend([
+            f'--volume={ssh_auth_sock}:/run/ssh-agent-host.sock',
+            f'--env=SSH_AUTH_SOCK=/run/ssh-agent-host.sock',
+        ])
+
     args.extend([
-        '--name', ctx.config.docker.server_container,
-        '--publish', '80:80',
-        '--publish', '3306:3306',
         ctx.config.docker.server_image,
         '/server.sh',
     ])
+
     return args
 
 
@@ -52,19 +98,25 @@ def other_command_args(ctx: Context) -> List[str]:
             f"in {projects_root} ausgeführt werden."
         )
 
-    args = common_args(ctx)
-
     workdir = host_workdir.replace(
         projects_root,
         ctx.config.general.projects_root_internal
     )
 
-    args.extend([
-        '--workdir', workdir,
-        ctx.config.docker.server_image,
-        'runuser', '-u', 'devbox', '--'
-    ])
-    
+    args = [
+        'docker',
+        'exec',
+        '--user=devbox',
+        f'--workdir={workdir}',
+        '--interactive',
+    ]
+
+    if sys.stdin.isatty():
+        logging.debug('TTY detected, passing --tty')
+        args.append('--tty')
+
+    args.append(ctx.config.docker.server_container)
+
     try:
         args.extend(resolve_shim(ctx))
     except InvalidSchema as e:
@@ -74,58 +126,5 @@ def other_command_args(ctx: Context) -> List[str]:
             f"\t{e.file_path}\n\n"
             f"{formatted_errors}"
         )
-
-    return args
-
-
-def common_args(ctx: Context) -> List[str]:
-    projects_root = ctx.config.general.projects_root
-    projects_root_internal = ctx.config.general.projects_root_internal
-
-    args = [
-        'docker',
-        'run',
-        '--rm',
-        '--interactive',
-
-        '--network', 'devbox',
-
-        '--volume',
-        f'{ctx.repo_dir}/config:/etc/devbox/host:ro',
-
-        '--volume', f'devbox-sockets:/run/devbox-sockets',
-        '--volume', f'{projects_root}:{projects_root_internal}',
-        '--volume', f'{ctx.repo_dir}/volumes/devbox-home:/home/devbox',
-        '--volume', f'{ctx.repo_dir}/volumes/logs/apache2:/var/log/apache2',
-        '--volume', f'{ctx.repo_dir}/volumes/logs/mariadb:/var/log/mysql',
-        '--volume', f'{ctx.repo_dir}/volumes/logs/php:/var/log/php',
-        '--volume', f'{ctx.repo_dir}/volumes/mariadb:/var/lib/mysql',
-        '--volume', f'{ctx.repo_dir}/volumes/php-sessions:/var/lib/php/sessions',  # noqa: E501
-
-        '--env', f'DEVBOX_UID={os.getuid()}',
-        '--env', f'DEVBOX_GID={os.getgid()}',
-    ]
-
-    if sys.stdin.isatty():
-        logging.debug('TTY detected, passing --tty')
-        args.append('--tty')
-
-    if ctx.config.cli.debug:
-        logging.debug('Debug mode is on, mapping devbox-py')
-        args.extend([
-            '--volume',
-            f'{ctx.repo_dir}/devbox-py/devbox:/src/devbox-py/devbox'
-        ])
-
-    if os.path.exists('/etc/localtime'):
-        logging.debug("Mapping host timezone")
-        args.extend(['--volume', '/etc/localtime:/etc/localtime:ro'])
-
-    if ssh_auth_sock := os.getenv('SSH_AUTH_SOCK'):
-        logging.debug("Mapping host SSH agent")
-        args.extend([
-            '--volume', f'{ssh_auth_sock}:/run/ssh-agent-host.sock',
-            '--env', f'SSH_AUTH_SOCK=/run/ssh-agent-host.sock',
-        ])
 
     return args

@@ -12,7 +12,7 @@ Damit das Devbox-Tooling funktioniert müssen bestimmte Systempakete installiert
 sein. Folgender Befehl installiert diese Pakete:
 
 ```
-$ sudo apt install python3-cerberus python3-docker python3-toml xdg-utils
+$ sudo apt install --yes python3-cerberus python3-distutils python3-docker python3-toml xdg-utils
 ```
 
 ## Setup per Repository

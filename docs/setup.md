@@ -32,7 +32,7 @@ Inhalt an (`~/sites` ersetzt du natürlich mit deinem Projektordner):
 
 ```toml
 [general]
-projects_root = ~/sites
+projects_root = "~/sites"
 ```
 
 Als letztes solltest du noch den `devbox`-Befehl in deiner `PATH`-Variable

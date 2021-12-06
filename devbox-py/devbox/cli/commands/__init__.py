@@ -33,7 +33,7 @@ def find_command(s: str) -> ModuleType:
     raise UsageError("Unbekannter Befehl!")
 
 
-from . import browser, build, pull, push, run, shell_init, ssh  # noqa: E402
+from . import browser, build, pull, push, resources, run, shell_init, ssh  # noqa: E402
 
 
 COMMANDS = [
@@ -41,6 +41,7 @@ COMMANDS = [
     build,
     pull,
     push,
+    resources,
     run,
     shell_init,
     ssh,
@@ -51,6 +52,7 @@ HELP = {
     "Benutzung": [
         run,
         ssh,
+				resources,
         browser,
     ],
 

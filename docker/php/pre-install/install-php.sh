@@ -28,6 +28,8 @@ install_php_versions() {
       "$prefix-xml"
       "$prefix-yaml"
       "$prefix-zip"
+      "$prefix-gmp"
+      "$prefix-bcmath"
     )
 
     if [[ "$version" == 5.6 ]]; then

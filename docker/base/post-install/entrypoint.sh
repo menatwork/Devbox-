@@ -23,4 +23,11 @@ chown --recursive devbox:devbox \
   /var/lib/mysql \
   /var/lib/php/sessions
 
+# Allow dnsmasq to listen on port 53 because resolv.conf doesn't let us specify
+# a different port for the system resolver
+setcap cap_net_bind_service=+ep /usr/sbin/dnsmasq
+
+# Replace resolv.conf copied from host with our own version
+cp /etc/resolv_custom.conf /etc/resolv.conf
+
 exec "$@"

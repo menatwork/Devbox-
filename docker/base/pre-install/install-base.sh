@@ -8,6 +8,7 @@ p=(
   rsync
   runit
   vim
+  dnsmasq
 )
 
 build-helper update

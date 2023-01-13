@@ -5,11 +5,12 @@ php_versions=(
   7.4
   8.0
   8.1
+  8.2
 )
 
 # see https://getcomposer.org/download/
-composer_1_version=1.10.23
-composer_2_version=2.1.9
+composer_1_version=1.10.26
+composer_2_version=2.5.1
 
 install_php_versions() {
   local p=()
